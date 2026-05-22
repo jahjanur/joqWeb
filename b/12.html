@@ -1,0 +1,46 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>JOQ</title>
+
+    <style>
+        body,
+        html {
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <script src='https://www.googletagservices.com/tag/js/gpt.js'>
+        googletag.pubads().definePassback('/197741849/app_joq__12', [
+            [300, 100],
+            [320, 100]
+        ]).display();
+
+        googletag.cmd.push(function() {
+            googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+                document.getElementById('google_ads_iframe_/197741849/app_joq__12_1__container__').style.height = "auto";
+
+                var body = document.body,
+                    html = document.documentElement;
+
+                var height = Math.max(body.scrollHeight, body.offsetHeight,
+                    html.clientHeight, html.scrollHeight, html.offsetHeight);
+                document.location.href += "#" + height;
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
