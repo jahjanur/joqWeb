@@ -327,6 +327,8 @@ function fix_photogallery_image($image) {
         'https://joq.al/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
         'https://joq-albania.com/imagesNew' => 'https://static.joq-albania.com/imagesNew',
         'https://admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
+        'http://new-admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
+        'https://new-admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
     );
     return strtr( $image, $unwanted_array );
 
@@ -339,6 +341,8 @@ function fix_post_thumbnail($link) {
         'https://joq.al/' => 'https://static.joq-albania.com/',
         'http://admin.joq.al/cachedWeb/imagesNew' => 'https://static.joq-albania.com/imagesNew',
         'https://admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
+        'http://new-admin.joq-albania.com/cachedWeb/imagesNew' => 'https://static.joq-albania.com/imagesNew',
+        'https://new-admin.joq-albania.com/cachedWeb/imagesNew' => 'https://static.joq-albania.com/imagesNew',
         'https://joq-albania.com/imagesNew' => 'https://static.joq-albania.com/imagesNew'
     );
     return strtr( $link, $unwanted_array );
@@ -377,6 +381,8 @@ function wp40547_filter_post_thumbnail_src( $image, $attachment_id, $size, $icon
 					$unwanted_array = array(
 						'http://new20.joq.al/cachedWeb/imagesNew/' => 'https://joq.al/imagesNew/',
 						'https://newjoq.joq.al/cachedWeb/imagesNew/' => 'https://joq.al/imagesNew/',
+                            'http://new-admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
+                            'https://new-admin.joq-albania.com/cachedWeb/imagesNew/' => 'https://static.joq-albania.com/imagesNew/',
 						'https://new20.joq.al/console/../imagesNew/' => 'https://joq.al/imagesNew/',
 						'http://admin.joq.al/console/../imagesNew/' => 'https://joq.al/imagesNew/', 
 						'http://admin.joq.al/cachedWeb/imagesNew/' => 'https://joq.al/imagesNew/',

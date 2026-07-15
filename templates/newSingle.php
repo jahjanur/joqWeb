@@ -1023,7 +1023,7 @@
 				          "theDate": "<?php echo  get_the_date('Y-m-d H:i:s'); ?>"
 					  	};
 
-					    fetch('https://dynamic.joq-albania.com/index-event', {
+					    fetch('https://dynamic2.joq-albania.com/search-event', {
 					      method: 'POST',
 					      headers: {
 					        'Content-Type': 'application/json'

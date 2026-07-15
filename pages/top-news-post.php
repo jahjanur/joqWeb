@@ -11,7 +11,7 @@ error_reporting(E_ALL);*/
 
 
 
-$popularPostsApi = 'https://dynamic.joq-albania.com/search-event';
+$popularPostsApi = 'https://dynamic2.joq-albania.com/search-event';
 $popularData = [
     "from" => 0,
     "size" => 0,
