@@ -1015,15 +1015,45 @@ body.menu-open { overflow: hidden; }
   display: block;
   position: relative;
   height: 580px;
+  overflow: hidden;             /* clips the scaled image layer */
   background-size: cover;
   background-position: center;
 }
-.swiper-slide-active .joq-hero__slide {
+
+/* The Ken Burns drift runs on this layer, not on the slide itself.
+   background-image: inherit picks up the inline style="background-image:..."
+   set by the render code, so no markup change is needed.
+
+   It animates transform, never background-size: scaling a background forces
+   the browser to re-rasterise the image every frame, and because
+   `background-size: X% auto` also changes the image's height it reflowed
+   inside the box each frame — that was the visible shaking. A transform is
+   composited on the GPU, so it stays perfectly steady. */
+.joq-hero__slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1);
+  transform-origin: center center;
+  backface-visibility: hidden;  /* avoids sub-pixel shimmer while scaling */
+}
+.joq-hero__overlay { z-index: 1; }
+
+.swiper-slide-active .joq-hero__slide::before {
   animation: kenBurns 8s var(--ease) forwards;
+  will-change: transform;
 }
 @keyframes kenBurns {
-  0% { background-size: 100% auto; }
-  100% { background-size: 108% auto; }
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swiper-slide-active .joq-hero__slide::before { animation: none; }
 }
 .joq-hero__overlay {
   position: absolute;
