@@ -13,15 +13,18 @@ button{cursor:pointer;border:none;background:none;font:inherit}
 input{font:inherit}
 
 /* FONTS
-   Uses the Hurme4 files already shipped in this theme (assets/fonts/).
-   These are byte-identical to the Hurme4-* set the design system was built
-   against, so no duplicate OTFs are added. Theme-relative path first,
-   site-root path as fallback for the statically cached pages.
-   No weight 500 face: this family has no Medium cut, so 500 resolves to 400. */
-@font-face{font-family:'Hurme4';src:url('/wp-content/themes/joq/assets/fonts/Hurme4.otf') format('opentype'),url('/assets/fonts/Hurme4.otf') format('opentype');font-weight:400;font-display:swap}
-@font-face{font-family:'Hurme4';src:url('/wp-content/themes/joq/assets/fonts/Hurme4SemiBold.otf') format('opentype'),url('/assets/fonts/Hurme4SemiBold.otf') format('opentype');font-weight:600;font-display:swap}
-@font-face{font-family:'Hurme4';src:url('/wp-content/themes/joq/assets/fonts/Hurme4Bold.otf') format('opentype'),url('/assets/fonts/Hurme4Bold.otf') format('opentype');font-weight:700;font-display:swap}
-@font-face{font-family:'Hurme4';src:url('/wp-content/themes/joq/assets/fonts/Hurme4Black.otf') format('opentype'),url('/assets/fonts/Hurme4Black.otf') format('opentype');font-weight:900;font-display:swap}
+   One declaration set that works in every context, so this file stays
+   byte-identical between the design repo and the WordPress theme.
+   Each src lists the candidates in order; the browser downloads the first
+   that resolves and ignores the rest, so the misses cost nothing:
+     1. theme path, production filename  (joq-theme  -> Hurme4Bold.otf)
+     2. site root, production filename   (static/cached pages)
+     3. site root, design-repo filename  (joq-website -> Hurme4-Bold.otf)
+   No weight 500: this family has no Medium cut, so 500 resolves to 400. */
+@font-face{font-family:'Hurme4';font-weight:400;font-display:swap;src:url('/wp-content/themes/joq/assets/fonts/Hurme4.otf') format('opentype'),url('/assets/fonts/Hurme4.otf') format('opentype'),url('/assets/fonts/Hurme4-Regular.otf') format('opentype')}
+@font-face{font-family:'Hurme4';font-weight:600;font-display:swap;src:url('/wp-content/themes/joq/assets/fonts/Hurme4SemiBold.otf') format('opentype'),url('/assets/fonts/Hurme4SemiBold.otf') format('opentype'),url('/assets/fonts/Hurme4-SemiBold.otf') format('opentype')}
+@font-face{font-family:'Hurme4';font-weight:700;font-display:swap;src:url('/wp-content/themes/joq/assets/fonts/Hurme4Bold.otf') format('opentype'),url('/assets/fonts/Hurme4Bold.otf') format('opentype'),url('/assets/fonts/Hurme4-Bold.otf') format('opentype')}
+@font-face{font-family:'Hurme4';font-weight:900;font-display:swap;src:url('/wp-content/themes/joq/assets/fonts/Hurme4Black.otf') format('opentype'),url('/assets/fonts/Hurme4Black.otf') format('opentype'),url('/assets/fonts/Hurme4-Black.otf') format('opentype')}
 
 :root {
   --red: #E31E24;
@@ -3013,4 +3016,47 @@ body.menu-open { overflow: hidden; }
   /* Static small mobile */
   .joq-static { padding: 0 14px; }
   .joq-static__title { font-size: 22px; }
+}
+
+
+/* ==========================================================================
+   READING PROGRESS
+   Rides the bottom edge of the sticky nav, so it stays visible while
+   scrolling without adding a second fixed element over the content.
+   ========================================================================== */
+.joq-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;              /* sit over the nav's 1px border */
+  height: 3px;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(255, 255, 255, .07);
+  opacity: 0;
+  transition: opacity .25s var(--ease);
+}
+.joq-progress.is-active { opacity: 1; }
+
+.joq-progress__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--red), #ff4d52);
+  box-shadow: 0 0 10px rgba(227, 30, 36, .55);
+  /* Transform only — never animates width, so it never triggers layout. */
+  will-change: transform;
+}
+
+/* The JS writes a new scaleX every frame; a transition on top of that would
+   lag behind the finger. Only smooth it out for pointer-driven scrolling. */
+@media (hover: hover) and (pointer: fine) {
+  .joq-progress__fill { transition: transform .08s linear; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joq-progress { transition: none; }
+  .joq-progress__fill { transition: none; box-shadow: none; }
 }
