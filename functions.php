@@ -20,7 +20,7 @@ function setup_settings(){
 
 	// remove wordpress update
 	remove_action( 'load-update-core.php', 'wp_update_plugins' );
-	add_filter( 'pre_site_transient_update_plugins', create_function( '$a', "return null;" ) );
+	add_filter( 'pre_site_transient_update_plugins', function( $a ) { return null; } );
 
 	add_filter('pre_site_transient_update_core', 'remove_core_updates');
 	add_filter('pre_site_transient_update_plugins', 'remove_core_updates');
