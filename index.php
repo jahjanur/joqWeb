@@ -3,6 +3,18 @@
 ob_start();
 
 global $generateLastNewsSys;
+
+/* Hero posts are queried before <head> so the lead image can be preloaded (LCP). */
+$joq_hero_q = new WP_Query( array(
+  'post_type'      => 'post',
+  'posts_per_page' => 10,
+  'post_status'    => 'publish',
+  'category_name'  => 'aktualitet',
+) );
+$joq_hero_lead_img = '';
+if ( $joq_hero_q->have_posts() ) {
+  $joq_hero_lead_img = fix_post_thumbnail( get_the_post_thumbnail_url( $joq_hero_q->posts[0]->ID, 'full' ) );
+}
   
 ?>
 <!DOCTYPE html>
@@ -36,7 +48,7 @@ global $generateLastNewsSys;
     <meta property="fb:pages" content="104916548544422" />
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="google-site-verification" content="kQ4bP_ZT5Z7QD2vAAheHvCVWxbFH7fRNIB55Ld-rAS8" />
     <meta property="fb:app_id" content="1591048791052134" />
 
@@ -57,11 +69,20 @@ global $generateLastNewsSys;
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/swiper-bundle.min.css" type="text/css" />
 
+    <!-- Early hints: CDN handshake, the hero LCP image, the two display weights used above the fold -->
+    <link rel="preconnect" href="https://static.joq-albania.com" />
+    <link rel="dns-prefetch" href="https://static.joq-albania.com" />
+    <?php if ( $joq_hero_lead_img ) : ?>
+    <link rel="preload" as="image" href="<?php echo esc_url( $joq_hero_lead_img ); ?>" fetchpriority="high" />
+    <?php endif; ?>
+    <link rel="preload" as="font" type="font/otf" href="/wp-content/themes/joq/assets/fonts/Hurme4Bold.otf" crossorigin />
+    <link rel="preload" as="font" type="font/otf" href="/wp-content/themes/joq/assets/fonts/Hurme4Black.otf" crossorigin />
+
     
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=3.0" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.4" type="text/css" />
 
     <script src="https://static.joq-albania.com/assets/js/jquery.min.js" type="text/javascript"></script>
   <script async src="https://static.joq-albania.com/assets/js/jquery.dfp.min.js" type="text/javascript"></script>
@@ -157,880 +178,641 @@ global $generateLastNewsSys;
 
     </script>
 
-  <!-- Toolbar -->
-  <div class="fixed-header">
-    <div class="container">
-      <div class="header-content">
-        <div class="header-socials pc-only">
+<a class="joq-skip" href="#joq-main">Kalo te p&euml;rmbajtja</a>
 
-          <a href="https://www.youtube.com/channel/UCVsMVFcGZgxXTl5A-usiIBQ/?sub_confirmation=1" target="_blank" class="youtube-icon" title="Youtube">
-            <svg viewBox="0 0 512 512"><path d="m224.113281 303.960938 83.273438-47.960938-83.273438-47.960938zm0 0"/><path d="m256 0c-141.363281 0-256 114.636719-256 256s114.636719 256 256 256 256-114.636719 256-256-114.636719-256-256-256zm159.960938 256.261719s0 51.917969-6.585938 76.953125c-3.691406 13.703125-14.496094 24.507812-28.199219 28.195312-25.035156 6.589844-125.175781 6.589844-125.175781 6.589844s-99.878906 0-125.175781-6.851562c-13.703125-3.6875-24.507813-14.496094-28.199219-28.199219-6.589844-24.769531-6.589844-76.949219-6.589844-76.949219s0-51.914062 6.589844-76.949219c3.6875-13.703125 14.757812-24.773437 28.199219-28.460937 25.035156-6.589844 125.175781-6.589844 125.175781-6.589844s100.140625 0 125.175781 6.851562c13.703125 3.6875 24.507813 14.496094 28.199219 28.199219 6.851562 25.035157 6.585938 77.210938 6.585938 77.210938zm0 0"/></svg>
-          </a>
+<?php get_template_part( 'templates/joqHeader' ); ?>
 
-          <a href="https://twitter.com/JoqAlbania" target="_blank" class="twitter-icon" title="Twitter">
-            <svg viewBox="0 0 97.75 97.75">
-              <g>
-                <path d="M48.875,0C21.882,0,0,21.882,0,48.875S21.882,97.75,48.875,97.75S97.75,75.868,97.75,48.875S75.868,0,48.875,0z    M78.43,35.841c0.023,0.577,0.035,1.155,0.035,1.736c0,20.878-15.887,42.473-42.473,42.473c-8.127,0-16.04-2.319-22.883-6.708   c-0.143-0.091-0.202-0.268-0.145-0.427c0.057-0.158,0.218-0.256,0.383-0.237c1.148,0.137,2.322,0.205,3.487,0.205   c6.323,0,12.309-1.955,17.372-5.664c-6.069-0.512-11.285-4.619-13.161-10.478c-0.039-0.122-0.011-0.255,0.073-0.351   c0.085-0.096,0.215-0.138,0.339-0.115c1.682,0.319,3.392,0.34,5.04,0.072c-6.259-1.945-10.658-7.808-10.658-14.483l0.002-0.194   c0.003-0.127,0.072-0.243,0.182-0.306c0.109-0.064,0.245-0.065,0.355-0.003c1.632,0.906,3.438,1.488,5.291,1.711   c-3.597-2.867-5.709-7.213-5.709-11.862c0-2.682,0.71-5.318,2.054-7.623c0.06-0.103,0.166-0.169,0.284-0.178   c0.119-0.012,0.234,0.04,0.309,0.132c7.362,9.03,18.191,14.59,29.771,15.305c-0.193-0.972-0.291-1.974-0.291-2.985   c0-8.361,6.802-15.162,15.162-15.162c4.11,0,8.082,1.689,10.929,4.641c3.209-0.654,6.266-1.834,9.09-3.508   c0.129-0.077,0.291-0.065,0.41,0.028c0.116,0.094,0.164,0.25,0.118,0.394c-0.957,2.993-2.823,5.604-5.33,7.489   c2.361-0.411,4.652-1.105,6.831-2.072c0.146-0.067,0.319-0.025,0.424,0.098c0.104,0.124,0.113,0.301,0.023,0.435   C83.759,31.175,81.299,33.744,78.43,35.841z"/>
-              </g>
-            </svg> 
-          </a>
+    <h1 class="sr-only">JOQ Albania &mdash; lajme nga Shqip&euml;ria, Kosova, Maqedonia dhe bota</h1>
 
-          <a href="https://www.facebook.com/joqalbania/" target="_blank" class="facebook-icon" title="Facebook">
-            <svg viewBox="0 0 97.75 97.75">
-              <g>
-                <path d="M48.875,0C21.882,0,0,21.882,0,48.875S21.882,97.75,48.875,97.75S97.75,75.868,97.75,48.875S75.868,0,48.875,0z    M67.521,24.89l-6.76,0.003c-5.301,0-6.326,2.519-6.326,6.215v8.15h12.641L67.07,52.023H54.436v32.758H41.251V52.023H30.229V39.258   h11.022v-9.414c0-10.925,6.675-16.875,16.42-16.875l9.851,0.015V24.89L67.521,24.89z"/>
-              </g>
-            </svg>
-          </a>
+    <?php
+      $joq_theme_uri = '/wp-content/themes/joq';
+      $joq_excluded  = array( 63551, 37958, 47302, 64190 );
+      /* IDs already rendered further up the page. Later sections pass this to
+         post__not_in so the same story is not shown two or three times. */
+      $joq_shown     = array();
+      $joq_hero_ids  = array();
+    ?>
 
-          <a href="https://www.instagram.com/joqalbania/" target="_blank" class="instagram-icon" title="Instagram">
-            <svg viewBox="0 0 512 512"><path d="m305 256c0 27.0625-21.9375 49-49 49s-49-21.9375-49-49 21.9375-49 49-49 49 21.9375 49 49zm0 0"/><path d="m370.59375 169.304688c-2.355469-6.382813-6.113281-12.160157-10.996094-16.902344-4.742187-4.882813-10.515625-8.640625-16.902344-10.996094-5.179687-2.011719-12.960937-4.40625-27.292968-5.058594-15.503906-.707031-20.152344-.859375-59.402344-.859375-39.253906 0-43.902344.148438-59.402344.855469-14.332031.65625-22.117187 3.050781-27.292968 5.0625-6.386719 2.355469-12.164063 6.113281-16.902344 10.996094-4.882813 4.742187-8.640625 10.515625-11 16.902344-2.011719 5.179687-4.40625 12.964843-5.058594 27.296874-.707031 15.5-.859375 20.148438-.859375 59.402344 0 39.25.152344 43.898438.859375 59.402344.652344 14.332031 3.046875 22.113281 5.058594 27.292969 2.359375 6.386719 6.113281 12.160156 10.996094 16.902343 4.742187 4.882813 10.515624 8.640626 16.902343 10.996094 5.179688 2.015625 12.964844 4.410156 27.296875 5.0625 15.5.707032 20.144532.855469 59.398438.855469 39.257812 0 43.90625-.148437 59.402344-.855469 14.332031-.652344 22.117187-3.046875 27.296874-5.0625 12.820313-4.945312 22.953126-15.078125 27.898438-27.898437 2.011719-5.179688 4.40625-12.960938 5.0625-27.292969.707031-15.503906.855469-20.152344.855469-59.402344 0-39.253906-.148438-43.902344-.855469-59.402344-.652344-14.332031-3.046875-22.117187-5.0625-27.296874zm-114.59375 162.179687c-41.691406 0-75.488281-33.792969-75.488281-75.484375s33.796875-75.484375 75.488281-75.484375c41.6875 0 75.484375 33.792969 75.484375 75.484375s-33.796875 75.484375-75.484375 75.484375zm78.46875-136.3125c-9.742188 0-17.640625-7.898437-17.640625-17.640625s7.898437-17.640625 17.640625-17.640625 17.640625 7.898437 17.640625 17.640625c-.003906 9.742188-7.898437 17.640625-17.640625 17.640625zm0 0"/><path d="m256 0c-141.363281 0-256 114.636719-256 256s114.636719 256 256 256 256-114.636719 256-256-114.636719-256-256-256zm146.113281 316.605469c-.710937 15.648437-3.199219 26.332031-6.832031 35.683593-7.636719 19.746094-23.246094 35.355469-42.992188 42.992188-9.347656 3.632812-20.035156 6.117188-35.679687 6.832031-15.675781.714844-20.683594.886719-60.605469.886719-39.925781 0-44.929687-.171875-60.609375-.886719-15.644531-.714843-26.332031-3.199219-35.679687-6.832031-9.8125-3.691406-18.695313-9.476562-26.039063-16.957031-7.476562-7.339844-13.261719-16.226563-16.953125-26.035157-3.632812-9.347656-6.121094-20.035156-6.832031-35.679687-.722656-15.679687-.890625-20.6875-.890625-60.609375s.167969-44.929688.886719-60.605469c.710937-15.648437 3.195312-26.332031 6.828125-35.683593 3.691406-9.808594 9.480468-18.695313 16.960937-26.035157 7.339844-7.480469 16.226563-13.265625 26.035157-16.957031 9.351562-3.632812 20.035156-6.117188 35.683593-6.832031 15.675781-.714844 20.683594-.886719 60.605469-.886719s44.929688.171875 60.605469.890625c15.648437.710937 26.332031 3.195313 35.683593 6.824219 9.808594 3.691406 18.695313 9.480468 26.039063 16.960937 7.476563 7.34375 13.265625 16.226563 16.953125 26.035157 3.636719 9.351562 6.121094 20.035156 6.835938 35.683593.714843 15.675781.882812 20.683594.882812 60.605469s-.167969 44.929688-.886719 60.605469zm0 0"/></svg>
-          </a>
-
+    <!-- Latest ticker -->
+    <?php
+      $tickerQ = new WP_Query( array(
+        'post_type'        => 'post',
+        'posts_per_page'   => 8,
+        'post_status'      => 'publish',
+        'category__not_in' => $joq_excluded,
+      ) );
+      $tickerItems = '';
+      $tickerCount = 0;
+      while ( $tickerQ->have_posts() ) : $tickerQ->the_post();
+        $tickerCount++;
+        $tickerItems .= '<a class="joq-ticker__item" href="' . get_permalink() . '"><strong>' . get_the_date( 'H:i' ) . '</strong>&nbsp; ' . esc_html( get_the_title() ) . '</a>';
+      endwhile; wp_reset_postdata();
+    ?>
+    <?php if ( $tickerItems ) : ?>
+    <div class="joq-ticker" role="region" aria-label="Lajmet e fundit">
+      <div class="joq-ticker__inner">
+        <span class="joq-ticker__badge">E fundit</span>
+        <div class="joq-ticker__scroll">
+          <?php /* track is duplicated so the -50% translate loops seamlessly;
+                   --n scales the animation duration to the number of items */ ?>
+          <div class="joq-ticker__track" style="--n: <?php echo $tickerCount; ?>"><?php echo $tickerItems . $tickerItems; ?></div>
         </div>
-        <div class="header-home mobile-only">
-          <a href="/faqe/live.html">
-            Live
-          </a>
-        </div>
-        <div class="header-logo-menu">
-          <div class="header-logo">
-            <a href="/" title="JOQ Albania">
-              <img src="https://static.joq-albania.com/assets/images/logoJOQ.jpg" alt="JoqAlbania logo">
-            </a>
-          </div>
-          <div class="header-menu pc-only">
-            <ul>
-              <!-- <a href="/kategori/vec-e-jona.html" class="vec-e-jona">
-                          <li id="vec-e-jona" data-name="vec-e-jona">
-                            Ve&ccedil; e jona
-                          </li>
-                      </a> -->
-                      <a href="/kategori/lajme.html" class="news">
-                          <li id="lajme" data-name="aktualitet">
-                            News
-                        </li>
-                      </a>
-                      <a href="/kosova/index.html" class="kosova">
-                          <li id="kosova" data-name="kosova">
-                            Kosova
-                        </li>
-                      </a>
-                      <!-- <a href="/maqedoni/index.html" class="maqedoni">
-                          <li id="maqedoni" data-name="maqedoni">Maqedoni</li>
-                      </a> -->
-                      <a href="/kategori/sport.html" class="sport">
-                          <li id="sport" data-name="sport">
-                            Sport
-                        </li>
-                      </a>
-                      <!-- <a href="/kategori/udhetime.html" class="udhetime">
-                          <li id="udhetime" data-name="udhetime">
-                            Travel
-                        </li>
-                      </a> -->
-                      <a href="/kategori/persekutimi-ndaj-joq.html" class="persekutimi-ndaj-joq">
-                          <li id="persekutimi-ndaj-joq" data-name="persekutimi-ndaj-joq">
-                            Persekutimi ndaj JOQ
-                        </li>
-                      </a>
-                      <!-- <a href="https://tehumbura.joq-albania.com/te-humbura/" class="te-humbura">
-                        <li id="te-humbura" data-name="te-humbura">
-                          Të humbura
-                        </li>
-                      </a> -->
-                      <a href="#" class="me-shume">
-                          <li id="me-shume" data-name="me-shume">
-                            M&euml; shum&euml;
-                            <i class="fa fa-caret-down"></i>
-                          </li>
-                      </a>
-            </ul>
-          </div>
-        </div>
-        <div class="header-search">
-          <a href="/faqe/live.html" class="live-svg-wrapper pc-only">
-            <svg class="live-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 122.88 69.01" style="enable-background:new 0 0 122.88 69.01" xml:space="preserve">
-                <style type="text/css"><![CDATA[
-                  .st0{fill-rule:evenodd;clip-rule:evenodd;fill:#E74040;}
-                  .st1{fill:#242424;}
-                ]]></style>
-              <g><path class="st0" d="M6.78,9.11H91.9c-0.15,0.81-0.25,1.65-0.3,2.49c-0.27,5.16,1.57,9.95,4.77,13.51 c3.06,3.4,7.37,5.69,12.26,6.12c0.34,0.05,0.69,0.08,1.05,0.08V31.3c0.73,0.02,1.45,0.01,2.16-0.05v30.98 c0,3.72-3.06,6.78-6.78,6.78H6.78C3.06,69.01,0,65.96,0,62.23V15.88C0,12.16,3.05,9.11,6.78,9.11L6.78,9.11L6.78,9.11z M110.97,0.02c6.94,0.37,12.26,6.29,11.89,13.23c-0.37,6.94-6.29,12.26-13.23,11.89c-6.94-0.37-12.26-6.29-11.89-13.23 C98.11,4.98,104.03-0.35,110.97,0.02L110.97,0.02z M110.71,4.71c2.18,0.12,4.1,1.1,5.45,2.6c1.35,1.5,2.12,3.51,2.01,5.69 c-0.12,2.18-1.1,4.1-2.6,5.45c-1.5,1.35-3.51,2.13-5.69,2.01c-2.18-0.12-4.11-1.1-5.45-2.6c-1.35-1.5-2.12-3.51-2.01-5.69 c0.12-2.18,1.1-4.11,2.6-5.45C106.53,5.37,108.54,4.59,110.71,4.71L110.71,4.71z M28.15,22.07v27.19h5.63v6.79h-15V22.07H28.15 L28.15,22.07L28.15,22.07z M46.4,22.07v33.98h-9.36V22.07H46.4L46.4,22.07L46.4,22.07z M73.28,22.07l-4.73,33.98H54.39l-5.42-33.98 h9.86c1.11,9.37,1.92,17.3,2.43,23.78c0.5-6.55,1.02-12.36,1.54-17.44l0.62-6.34H73.28L73.28,22.07L73.28,22.07z M75.86,22.07 h15.59v6.79h-6.22v6.49h5.82v6.44h-5.82v7.48h6.86v6.79H75.86V22.07L75.86,22.07L75.86,22.07z"/><path class="st1" d="M110.56,7.69c2.7,0.14,4.77,2.45,4.63,5.14c-0.14,2.7-2.45,4.77-5.14,4.63c-2.7-0.14-4.77-2.45-4.63-5.14 S107.86,7.55,110.56,7.69L110.56,7.69z"/></g>
-            </svg>
-          </a>
-          <svg viewBox="0 0 118.783 118.783" class="menu-search" style="cursor: pointer;">
-            <g>
-              <path d="M115.97,101.597L88.661,74.286c4.64-7.387,7.333-16.118,7.333-25.488c0-26.509-21.49-47.996-47.998-47.996   S0,22.289,0,48.798c0,26.51,21.487,47.995,47.996,47.995c10.197,0,19.642-3.188,27.414-8.605l26.984,26.986   c1.875,1.873,4.333,2.806,6.788,2.806c2.458,0,4.913-0.933,6.791-2.806C119.72,111.423,119.72,105.347,115.97,101.597z    M47.996,81.243c-17.917,0-32.443-14.525-32.443-32.443s14.526-32.444,32.443-32.444c17.918,0,32.443,14.526,32.443,32.444   S65.914,81.243,47.996,81.243z"/>
-            </g>
-          </svg>
-          <a title="English" href="/english/index.html" class="en-logo">
-              <svg style="width: 22px; height:  22px;" viewBox="0 0 512.002 512.002">
-                  <path style="fill:#41479B;" d="M503.172,423.725H8.828c-4.875,0-8.828-3.953-8.828-8.828V97.104c0-4.875,3.953-8.828,8.828-8.828  h494.345c4.875,0,8.828,3.953,8.828,8.828v317.793C512,419.772,508.047,423.725,503.172,423.725z"></path>
-                  <path style="fill:#F5F5F5;" d="M512,97.104c0-4.875-3.953-8.828-8.828-8.828h-39.495l-163.54,107.147V88.276h-88.276v107.147  L48.322,88.276H8.828C3.953,88.276,0,92.229,0,97.104v22.831l140.309,91.927H0v88.276h140.309L0,392.066v22.831  c0,4.875,3.953,8.828,8.828,8.828h39.495l163.54-107.147v107.147h88.276V316.578l163.54,107.147h39.495  c4.875,0,8.828-3.953,8.828-8.828v-22.831l-140.309-91.927H512v-88.276H371.691L512,119.935V97.104z"></path>
-                  <g>
-                      <polygon style="fill:#FF4B55;" points="512,229.518 282.483,229.518 282.483,88.276 229.517,88.276 229.517,229.518 0,229.518    0,282.483 229.517,282.483 229.517,423.725 282.483,423.725 282.483,282.483 512,282.483  "></polygon>
-                      <path style="fill:#FF4B55;" d="M178.948,300.138L0.25,416.135c0.625,4.263,4.14,7.59,8.577,7.59h12.159l190.39-123.586h-32.428   V300.138z"></path>
-                      <path style="fill:#FF4B55;" d="M346.388,300.138H313.96l190.113,123.404c4.431-0.472,7.928-4.09,7.928-8.646v-7.258   L346.388,300.138z"></path>
-                      <path style="fill:#FF4B55;" d="M0,106.849l161.779,105.014h32.428L5.143,89.137C2.123,90.54,0,93.555,0,97.104V106.849z"></path>
-                      <path style="fill:#FF4B55;" d="M332.566,211.863L511.693,95.586c-0.744-4.122-4.184-7.309-8.521-7.309h-12.647L300.138,211.863   H332.566z"></path>
-                  </g>
-              </svg>
-          </a>
-                  <svg viewBox="0 0 512 512" id="open-mobile-menu" class="mobile-only"><path d="m464.883 64.267h-417.766c-25.98 0-47.117 21.136-47.117 47.149 0 25.98 21.137 47.117 47.117 47.117h417.766c25.98 0 47.117-21.137 47.117-47.117 0-26.013-21.137-47.149-47.117-47.149z"/><path d="m464.883 208.867h-417.766c-25.98 0-47.117 21.136-47.117 47.149 0 25.98 21.137 47.117 47.117 47.117h417.766c25.98 0 47.117-21.137 47.117-47.117 0-26.013-21.137-47.149-47.117-47.149z"/><path d="m464.883 353.467h-417.766c-25.98 0-47.117 21.137-47.117 47.149 0 25.98 21.137 47.117 47.117 47.117h417.766c25.98 0 47.117-21.137 47.117-47.117 0-26.012-21.137-47.149-47.117-47.149z"/></svg>
-                  <svg id="close-mobile-menu" class="hide" viewBox="0 0 348.333 348.334">
-            <g>
-              <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85   c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563   c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85   l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554   L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
-            </g>
-          </svg>
-        </div>
+        <button type="button" class="joq-ticker__toggle" aria-pressed="false" aria-label="Ndalo l&euml;vizjen">
+          <svg class="joq-ticker__ico-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+          <svg class="joq-ticker__ico-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+        </button>
       </div>
     </div>
-  </div>
-  <!-- End Toolbar -->
-
-  <div class="spacer-menu"></div>
-
-  <!-- Hover Menu -->
-  <div class="hovermenu pc-only">
-    <div class="container">
-
-      <div class="hovermenu-wrapper">
-        <div class="hovermenu-block">
-          <div class="hovermenu-block-title">Kategoritë</div>
-          <ul>
-                  <li>
-                      <a href="/kategori/vec-e-jona.html"> Veç e Jona </a>
-                  </li>
-                  <li>
-                      <a href="/kategori/lajme.html"> Lajme </a>
-                  </li>
-                  <li>
-                      <a href="/kategori/teknologji.html"> Teknologji </a>
-                  </li>
-                  <li>
-                      <a href="/kategori/bota.html"> Bota </a>
-                  </li>
-                  <li>
-                      <a href="/kategori/argetim.html"> Argëtim </a>
-                  </li>
-                  <li>
-                      <a href="/maqedoni/index.html"> Maqedoni </a>
-                  </li>
-              </ul>
-        </div>
-        <div class="hovermenu-block-seperator"></div>
-        <div class="hovermenu-block">
-          <div class="hovermenu-block-title">Rreth Nesh</div>
-          <ul>
-              <li>
-                  <a href="/faqe/rreth-nesh.html"> Rreth Nesh </a>
-              </li>
-              <li>
-                  <a href="/faqe/puno-me-ne.html"> Puno me ne! </a>
-              </li>
-              <li>
-                  <a href="/faqe/live.html"> Live </a>
-              </li>
-          </ul>
-        </div>
-        <div class="hovermenu-block-seperator"></div>
-        <div class="hovermenu-block">
-          <div class="hovermenu-block-title">Kontakt</div>
-          <ul>
-              <li>
-                  <a href="/faqe/reklamo.html">Marketing </a>
-              </li>
-              <li>
-                  <a href="/faqe/kontakto.html"> Kontakt </a>
-              </li>
-          </ul>
-        </div>
-        <div class="hovermenu-block-seperator"></div>
-        <div class="hovermenu-block">
-          <div class="hovermenu-block-title">Privatësia</div>
-          <ul>
-              <li>
-                  <a href="/faqe/politika-e-privatesise.html"> Politika e privatësisë </a>
-              </li>
-              <li>
-                  <a href="/faqe/kushtet-e-perdorimit.html"> Kushtet e përdorimit </a>
-              </li>
-          </ul>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- End Hover Menu -->
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu">
-      <ul>
-          <a href="/kategori/vec-e-jona.html">
-              <li data-name="tonat">Veç e jona</li>
-          </a>
-          <a href="/kategori/lajme.html">
-              <li data-name="aktualitet">News</li>
-          </a>
-          <a href="/kategori/sondazhe.html">
-              <li data-name="sondazhe">Sondazhe</li>
-          </a>
-          <a href="/kosova/index.html">
-              <li data-name="kosova">Kosova</li>
-          </a>
-          <a href="/maqedoni/index.html">
-              <li data-name="maqedoni">Maqedoni</li>
-          </a>
-          <a href="/faqe/live.html">
-              <li data-name="maqedoni">Live</li>
-          </a>
-          <a href="/kategori/bota.html">
-              <li data-name="perditshmeri">Bota</li>
-          </a>
-          <a href="/kategori/persekutimi-ndaj-joq.html">
-              <li data-name="persekutimi-ndaj-joq">
-                Persekutimi ndaj JOQ
-            </li>
-          </a>
-          <!-- <a href="https://tehumbura.joq-albania.com/te-humbura/">
-            <li data-name="te-humbura">Të humbura</li>
-          </a> -->
-          <a href="/kategori/sport.html">
-              <li data-name="perditshmeri">Sport</li>
-          </a>
-          <a href="/kategori/udhetime.html">
-              <li data-name="udhetime">Travel</li>
-          </a>
-          <a href="/kategori/teknologji.html">
-              <li data-name="shkence">Teknologji</li>
-          </a>
-          <a href="/kategori/kuriozitete.html">
-              <li data-name="kuriozitete">Kuriozitete</li>
-          </a>
-          <a href="/kategori/thashetheme.html">
-              <li data-name="thashetheme">Thashetheme</li>
-          </a>
-          <a href="/kategori/udhetime.html">
-              <li data-name="udhetime">Udhetime</li>
-          </a>
-          <a href="/kategori/shendeti.html">
-              <li data-name="shendeti">Shëndeti</li>
-          </a>
-          <a href="/kategori/si-te.html">
-              <li data-name="si-te">Si të...</li>
-          </a>
-          <a href="/faqe/puno-me-ne.html" target="_blank">
-              <li>Puno me ne!</li>
-          </a>
-          <a href="/faqe/reklamo.html" target="_blank">
-              <li>Marketing</li>
-          </a>
-          <a href="/faqe/politika-e-privatesise.html" target="_blank">
-              <li>Politikat e Privatësisë</li>
-          </a>
-          <a href="/faqe/rreth-nesh.html" target="_blank">
-              <li>Rreth Nesh</li>
-          </a>
-          <a href="/faqe/kushtet-e-perdorimit.html" target="_blank">
-              <li>Kushtet e Përdorimit</li>
-          </a>
-          <a href="/faqe/kontakto.html" target="_blank">
-              <li>Kontakt</li>
-          </a>
-      </ul>
-  </div>
-  <!-- End Mobile Menu -->
-
-    <!-- Search -->
-    <div class="full-search">
-        <svg class="close-search" viewBox="0 0 348.333 348.334">
-      <g style="fill: #fff;">
-        <path d="M336.559,68.611L231.016,174.165l105.543,105.549c15.699,15.705,15.699,41.145,0,56.85   c-7.844,7.844-18.128,11.769-28.407,11.769c-10.296,0-20.581-3.919-28.419-11.769L174.167,231.003L68.609,336.563   c-7.843,7.844-18.128,11.769-28.416,11.769c-10.285,0-20.563-3.919-28.413-11.769c-15.699-15.698-15.699-41.139,0-56.85   l105.54-105.549L11.774,68.611c-15.699-15.699-15.699-41.145,0-56.844c15.696-15.687,41.127-15.687,56.829,0l105.563,105.554   L279.721,11.767c15.705-15.687,41.139-15.687,56.832,0C352.258,27.466,352.258,52.912,336.559,68.611z"/>
-      </g>
-    </svg>
-        <form action="/kerko.html" method="GET">
-            <input type="text" spellcheck="false" name="search" placeholder="Kërko dhe shtyp enter" required="">
-        </form>
-    </div>
-    <!-- End Search -->
+    <?php endif; ?>
+    <!-- End Latest ticker -->
 
     <!-- Home Headline -->
-    <div class="home-headline-wrapper">
+    <div class="joq-hero">
       <div class="swiper mySwiper">
         <div class="swiper-wrapper">
-
-          <!-- te zgjedhura -->
       <?php
-        $lastHeadlines = new WP_query('type=post&posts_per_page=10&category_name=aktualitet');
-        while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
+        while( $joq_hero_q->have_posts() ): $joq_hero_q->the_post();
+          $joq_shown[]    = get_the_ID();
+          $joq_hero_ids[] = get_the_ID();
+          $heroCat = get_the_category();
       ?>
           <div class="swiper-slide">
-            <a 
-            title="<?php echo the_title(); ?>"
-            target="_self"
-          style="background-image: url('<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'full' )) ?>')" 
-          href="<?php echo get_permalink() ?>" 
-          class="home-headline-img">
-            <div class="home-headline-title">
-              <h2>
-                <span>
-                  <?php echo the_title(); ?>
-                </span>
-              </h2>
-            </div>
-          </a>
+            <a class="joq-hero__slide"
+               title="<?php echo esc_attr( get_the_title() ); ?>"
+               target="_self"
+               style="background-image: url('<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'full' )) ?>')"
+               href="<?php echo get_permalink() ?>">
+              <span class="joq-hero__overlay"></span>
+              <div class="joq-hero__content">
+                <?php if ( ! empty( $heroCat ) ) : ?>
+                  <span class="joq-hero__cat"><?php echo $heroCat[0]->cat_name; ?></span>
+                <?php endif; ?>
+                <h2 class="joq-hero__title"><?php echo get_the_title(); ?></h2>
+                <p class="joq-hero__excerpt"><?php echo wp_trim_words( wp_strip_all_tags( get_the_content() ), 22, '...' ); ?></p>
+                <div class="joq-hero__meta">
+                  <time datetime="<?php echo get_the_date( 'c' ); ?>"><?php echo get_the_date( 'd.m.Y, H:i' ); ?></time>
+                  <span class="joq-hero__read">Lexo m&euml; shum&euml; &rarr;</span>
+                </div>
+              </div>
+            </a>
           </div>
           <?php endwhile; wp_reset_postdata(); ?>
-
         </div>
         <div class="swiper-pagination"></div>
       </div>
-      <div class="home-headline-borders">
-        <div class="home-headline-border left"></div>
-        <div class="home-headline-border mid"></div>
-        <div class="home-headline-border right"></div>
-      </div>
     </div>
     <!-- End Home Headline -->
-    
-    <div class="container padding-mobile" style="margin-bottom: 50px;">
 
-      <div class="mobile-home-content-controller">
-        <div class="mobile-controller-item" data-item="home-featured">
-          Ofron JOQ
-        </div>
-        <div class="mobile-controller-item" data-item="home-top-news">
-          Lexon Populli
-        </div>
-        <div class="mobile-controller-item active" data-item="home-last-news">
-          T&euml; Fundit
-        </div>
+    <main class="joq-main" id="joq-main">
+
+      <div class="fixed-left-banner pc-only">
+        <div class="adunit-1" data-adunit="joq__floating-left" data-dimensions="160x600" style="width:160px; height:600px;"></div>
       </div>
-      
-      <div class="home-content-wrapper">
-        
-        <!-- Home Featured -->
-        <div class="home-featured home-content-item">
+      <div class="fixed-right-banner pc-only">
+        <div class="adunit-1" data-adunit="joq__floating-right" data-dimensions="160x600" style="width:160px; height:600px;"></div>
+      </div>
 
-          <div class="fixed-left-banner pc-only">
-          <div class="adunit-1" data-adunit="joq__floating-left" data-dimensions="160x600" style="width:160px; height:600px;"></div>
-        </div>
+      <!-- Category tiles -->
+      <?php
+        /* label, href, icon file (144px WebP in assets/images/icons/), inline SVG fallback used if the file is missing */
+        $joq_tiles = array(
+          array( 'Shqip&euml;ri',        '/kategori/aktualitet.html',           'albania-joq.webp',         '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>' ),
+          array( 'News',                 '/kategori/lajme.html',                'News-glass-joq.webp',      '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0V6h4"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/>' ),
+          array( 'Kosova',               '/kosova/index.html',                  'Kosovo-glass-joq.webp',    '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>' ),
+          array( 'Maqedoni',             '/maqedoni/index.html',                'Macedonia-glass-joq.webp', '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/>' ),
+          array( 'Sport',                '/kategori/sport.html',                'ball-joq.webp',            '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>' ),
+          array( 'Ve&ccedil; e jona',    '/kategori/vec-e-jona.html',           'vip-joq.webp',             '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' ),
+          array( 'Persekutimi ndaj JOQ', '/kategori/persekutimi-ndaj-joq.html', 'preskeutim-joq.webp',      '<path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>' ),
+          array( 'Arg&euml;tim',         '/kategori/argetim.html',              'argetimm-joq.webp',        '<rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>' ),
+          array( 'Teknologji',           '/kategori/teknologji.html',           'teknologji-joq.webp',      '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>' ),
+        );
+        $joq_tile_dir = get_template_directory() . '/assets/images/icons/';
+      ?>
+      <nav class="joq-tiles" data-animate aria-label="Kategorit&euml;">
+        <?php foreach ( $joq_tiles as $t ) : ?>
+        <a class="joq-tile" href="<?php echo $t[1]; ?>">
+          <span class="joq-tile__icon">
+            <?php if ( file_exists( $joq_tile_dir . $t[2] ) ) : ?>
+              <img src="<?php echo $joq_theme_uri; ?>/assets/images/icons/<?php echo $t[2]; ?>?v=<?php echo JOQ_ICON_VER; ?>" alt="" width="72" height="72" loading="lazy" decoding="async" />
+            <?php else : ?>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><?php echo $t[3]; ?></svg>
+            <?php endif; ?>
+          </span>
+          <span class="joq-tile__label"><?php echo $t[0]; ?></span>
+        </a>
+        <?php endforeach; ?>
+      </nav>
+      <!-- End Category tiles -->
 
-          <div class="block-title">
-            Ofron JOQ
-          </div>
+      <!-- Aktualitet + Të fundit -->
+      <section class="joq-section joq-section--feed" data-animate>
+        <div class="joq-home-split">
 
-          <!-- te zgjedhura -->
-        <?php
-          $lastHeadlines = new WP_query('type=post&posts_per_page=6&category_name=aktualitet&offset=1');
-          while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
-            $category = get_the_category(); 
-        ?>
+          <div class="joq-home-split__main">
 
-          <div class="article-wrapper">
-            <a href="<?php echo get_permalink() ?>">
-              <div class="article-image">
-                <img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>" 
-                alt="<?php echo the_title(); ?>">
-              </div>
-              <div class="article-title">
-                <?php echo the_title(); ?>
-              </div>
-            </a>
-            <a class="article-cat-link" href="https://joq-albania.com/kategori/<?php echo $category[0]->slug; ?>.html">
-              <div class="article-cat"><?php echo $category[0]->cat_name; ?></div>
-            </a>
-          </div>
-
-          <?php endwhile; wp_reset_postdata(); ?>
-
-        </div>
-        <!-- End Home Featured -->
-
-        <!-- Home Top News -->
-        <div class="home-top-news home-content-item">
-          <div class="block-title">
-            Lexon Populli
-          </div>
-          <div class="loadTopNews">
-            <script async type="text/javascript">
-              $.get( "/myAjax/top-news2.html", function( data ) {
-              $( ".loadTopNews" ).html( data );
-            });
-            </script>
-          </div>
-        </div>
-        <!-- End Home Top News -->
-
-        <!-- Home Last News -->
-        <div class="home-last-news home-content-item" style="display: block;">
-
-          <div class="fixed-right-banner pc-only">
-          <div class="adunit-1" data-adunit="joq__floating-right" data-dimensions="160x600" style="width:160px; height:600px;"></div>
-        </div>
-
-          <div class="block-title">
-            T&euml; Fundit
-          </div>
-          <style type="text/css">
-            @media only screen and (min-width: 768px) {
-              .home-last-news .article-wrapper {
-                  width: 340px;
-              }
-            }
-          </style>
-          <div class="article-wrapper">
-
-            <!-- last news -->
-          <?php
-
-              $i = 0;
-              $argsQuery = array(
-                'type'             => 'post',
-                'posts_per_page'   => 11,
-                'post_status'      => 'publish',
-                'category__not_in' => array( 63551,  37958, 47302, 64190), 
+            <?php
+              /* Category blocks, in the order they appear down the page. Edit
+                 this list to add, drop or reorder them — each entry renders one
+                 block, preceded by three stories from the general news stream. */
+              $joq_home_cats = array(
+                array( 'Kosova',               'kosova' ),
+                array( 'Maqedoni',             'maqedoni' ),
+                array( 'Sport',                'sport' ),
+                array( 'Ve&ccedil; e jona',    'vec-e-jona' ),
+                array( 'Persekutimi ndaj JOQ', 'persekutimi-ndaj-joq' ),
+                array( 'Arg&euml;tim',         'argetim' ),
+                array( 'Teknologji',           'teknologji' ),
               );
-            $lastHeadlines = new WP_query($argsQuery);
-              while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
 
-              $i++;
+              /* Blocks are resolved first so each one keeps the freshest posts of
+                 its own category; the stream below is then filled from whatever
+                 is left, which is what keeps a story from appearing twice. */
+              /* The four mobile 300x100 units. On a phone the rail stacks below the
+                 whole feed, so left in the rail every mobile ad landed ~70% down the
+                 page in one clump. Same units, spread through the feed instead; on
+                 desktop they stay hidden and the rail's 300x250s serve. */
+              $joq_mobile_ads = array( 'app_joq__10', 'app_joq__6', 'app_joq__3', 'app_joq__16' );
+              $joq_ad_i       = 0;
 
-              if($i === 2) {
+              $joq_blocks = array();
+              foreach ( $joq_home_cats as $joq_cat ) {
+                $catQ = new WP_Query( array(
+                  'post_type'      => 'post',
+                  'posts_per_page' => 4,
+                  'post_status'    => 'publish',
+                  'category_name'  => $joq_cat[1],
+                  'post__not_in'   => $joq_shown,
+                ) );
+                if ( ! $catQ->have_posts() ) { wp_reset_postdata(); continue; }
 
+                $catPosts = $catQ->posts;
+                foreach ( $catPosts as $catPost ) { $joq_shown[] = $catPost->ID; }
+                wp_reset_postdata();
+
+                $joq_blocks[] = array(
+                  'label' => $joq_cat[0],
+                  'slug'  => $joq_cat[1],
+                  'lead'  => array_shift( $catPosts ),
+                  'items' => $catPosts,
+                );
+              }
+
+              /* One query for every group of three, sliced per cycle below. */
+              $joq_stream = array();
+              if ( $joq_blocks ) {
+                $streamQ = new WP_Query( array(
+                  'post_type'        => 'post',
+                  'posts_per_page'   => 3 * count( $joq_blocks ),
+                  'post_status'      => 'publish',
+                  'category__not_in' => $joq_excluded,
+                  'post__not_in'     => $joq_shown,
+                ) );
+                $joq_stream = $streamQ->posts;
+                foreach ( $joq_stream as $streamPost ) { $joq_shown[] = $streamPost->ID; }
+                wp_reset_postdata();
+              }
+
+              /* The rail only needs to avoid what sits beside it. Excluding the
+                 whole feed would push it onto days-old posts, which defeats
+                 a list called "Të fundit". */
+              $joq_rail_exclude = $joq_hero_ids;
+              for ( $c = 0; $c < 2 && $c < count( $joq_blocks ); $c++ ) {
+                foreach ( array_slice( $joq_stream, $c * 3, 3 ) as $nearPost ) {
+                  $joq_rail_exclude[] = $nearPost->ID;
+                }
+                $joq_rail_exclude[] = $joq_blocks[ $c ]['lead']->ID;
+                foreach ( $joq_blocks[ $c ]['items'] as $nearPost ) {
+                  $joq_rail_exclude[] = $nearPost->ID;
+                }
+              }
+            ?>
+
+            <div class="joq-section__header">
+              <h2 class="joq-section__title"><?php echo joq_cat_icon_img( 'lajme', 'joq-section__title-icon' ); ?>Lajmet e fundit</h2>
+              <a class="joq-section__more" href="/kategori/lajme.html">Shiko t&euml; gjitha &rarr;</a>
+            </div>
+
+            <?php /* One cycle = three stories + its category block = one page. */ ?>
+            <?php foreach ( $joq_blocks as $joq_bi => $joq_block ) : ?>
+            <div class="joq-cycle<?php echo $joq_bi === 0 ? ' is-active' : ''; ?>" data-cycle="<?php echo $joq_bi; ?>">
+
+            <div class="joq-stories">
+              <?php foreach ( array_slice( $joq_stream, $joq_bi * 3, 3 ) as $sp ) :
+                $spCat = get_the_category( $sp->ID );
+                $spImg = fix_post_thumbnail( get_the_post_thumbnail_url( $sp->ID, 'img2' ) );
               ?>
+              <article class="joq-story">
+                <a href="<?php echo get_permalink( $sp->ID ); ?>">
+                  <div class="joq-story__body">
+                    <?php if ( ! empty( $spCat ) ) :
+                      $spIcon = joq_cat_icon_img( $spCat[0]->slug, 'joq-story__kicker-icon' );
+                    ?>
+                      <span class="joq-story__kicker">
+                        <?php echo $spIcon; ?><?php echo $spCat[0]->cat_name; ?>
+                      </span>
+                    <?php endif; ?>
+                    <h3 class="joq-story__title"><?php echo get_the_title( $sp->ID ); ?></h3>
+                    <p class="joq-story__excerpt"><?php echo wp_trim_words( wp_strip_all_tags( $sp->post_content ), 26, '...' ); ?></p>
+                    <div class="joq-story__meta">
+                      <time datetime="<?php echo get_the_date( 'c', $sp->ID ); ?>"><?php echo joq_time_ago( $sp ); ?></time>
+                      &middot; <?php echo joq_read_time( $sp ); ?> min lexim
+                    </div>
+                  </div>
+                  <?php /* box always renders; with no thumbnail its fallback mark shows */ ?>
+                  <div class="joq-story__media">
+                    <?php if ( $spImg ) : ?>
+                    <img src="<?php echo $spImg; ?>" alt="" width="527" height="375" loading="lazy" decoding="async" />
+                    <?php endif; ?>
+                  </div>
+                </a>
+              </article>
+              <?php endforeach; ?>
+            </div>
 
-                <div class="mobile-only" style="text-align: center; height:auto; margin:-15px auto 15px;">
-                  <div class="adunit-1" data-adunit="app_joq__10" data-dimensions="300x100"></div>
-                </div>
-                
-                
-
-              <?php
-
-              }
-
-              if($i === 3) { ?>
-
-                <div class="mobile-only" style="text-align: center; height:auto; margin:-15px auto 15px;">
-                  <div class="adunit-1" data-adunit="app_joq__6" data-dimensions="300x100"></div>
-                </div>
-
-                <div class="pc-only" style="width:300px; height:auto; margin-bottom:15px;">
-                    <div class="adunit-1" data-adunit="joq__300x250-8" data-dimensions="300x250"></div>
-                </div>
-
-                
-
-              <?php
-
-              }
-
-              if($i === 4) {
-
-              ?>
-
-                <div class="mobile-only" style="text-align: center; height:auto; margin:-15px auto 15px;">
-                  <div class="adunit-1" data-adunit="app_joq__3" data-dimensions="300x100"></div>
-                </div>
-
-                <div class="pc-only" style="width:300px; height:auto; margin-bottom: 15px;">
-                    <div class="adunit-1" data-adunit="joq__300x250-4" data-dimensions="300x250"></div>
-                </div>
-              
-
-              <?php
-
-              }
-
-              if($i === 5) { ?>
-
-                <div class="pc-only" style="width:300px; height:auto; margin-bottom: 15px;">
-                    <div class="adunit-1" data-adunit="joq__PC-300x250-11" data-dimensions="300x250"></div>
-                </div>
-
-
-                <div class="pc-only" style="width:300px; height:auto; margin-bottom: 15px;">
-                    <div class="adunit-1" data-adunit="joq__300x250-9" data-dimensions="300x250"></div>
-                </div>
-
-              <?php
-
-              }
-
-              if($i === 6) { ?>
-
-                <div class="mobile-only" style="text-align: center; height:auto; margin:-15px auto 15px;">
-                  <div class="adunit-1" data-adunit="app_joq__16" data-dimensions="300x100"></div>
-                </div>
-
-              <?php
-
-              }
-
-              if($i === 7) {
-
-              ?>
-
-
-                <div class="pc-only" style="width:300px; height:auto; margin-bottom: 15px;">
-                    <div class="adunit-1" data-adunit="joq__300x250-bottomRight" data-dimensions="300x250"></div>
-                </div>
-
-
-              <?php
-
-              }
-
-              if($i === 9) {
-
-              ?>
-
-              <style type="text/css">
-                  .mob_pc_banners {
-                      max-width: 300px;
-                      margin-bottom: 15px;
-                  }
-
-                  @media only screen and (max-width: 768px) {
-                      .mob_pc_banners {
-                          width: 300px;
-                          margin: 0 auto 5px;
-                      }
-                  }
-              </style>
-
-              <div class="mob-pc-banner-wrapper" style="margin-bottom: 20px">
-                  <a href="https://aleancaetike.media/decent-invest-offer-easily/" target="_blank">
-                      <img style="width: 100%;" src="/b/ame/300x260/2020-27-10.jpg">
-                  </a>
+            <?php
+              $rowLead = $joq_block['lead'];
+              $leadImg = fix_post_thumbnail( get_the_post_thumbnail_url( $rowLead->ID, 'img2' ) );
+            ?>
+            <section class="joq-catblock">
+              <div class="joq-section__header">
+                <h2 class="joq-section__title"><?php echo joq_cat_icon_img( $joq_block['slug'], 'joq-section__title-icon' ); ?><?php echo $joq_block['label']; ?></h2>
+                <a class="joq-section__more" href="/kategori/<?php echo $joq_block['slug']; ?>.html">Shiko t&euml; gjitha &rarr;</a>
               </div>
+              <div class="joq-catblock__inner">
 
+                <a class="joq-catblock__lead" href="<?php echo get_permalink( $rowLead->ID ); ?>">
+                  <h3 class="joq-catblock__lead-title"><?php echo get_the_title( $rowLead->ID ); ?></h3>
+                  <p class="joq-catblock__lead-excerpt"><?php echo wp_trim_words( wp_strip_all_tags( $rowLead->post_content ), 24, '...' ); ?></p>
+                  <div class="joq-catblock__lead-media">
+                    <?php if ( $leadImg ) : ?>
+                    <img src="<?php echo $leadImg; ?>" alt="" width="527" height="375" loading="lazy" decoding="async" />
+                    <?php endif; ?>
+                  </div>
+                  <div class="joq-catblock__meta">
+                    <time datetime="<?php echo get_the_date( 'c', $rowLead->ID ); ?>"><?php echo joq_time_ago( $rowLead ); ?></time>
+                    &middot; <?php echo joq_read_time( $rowLead ); ?> min lexim
+                  </div>
+                </a>
 
-              <?php
-
-              }
-
-          ?>
-
-            <div class="last-news-article-wrapper">
-              <a href="<?php echo get_permalink() ?>" title="<?php echo the_title(); ?>">
-                <div class="article-image" 
-                  style="background-image: url(<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>);">
+                <div class="joq-catblock__list">
+                  <?php foreach ( $joq_block['items'] as $rowPost ) : ?>
+                  <a class="joq-catblock__item" href="<?php echo get_permalink( $rowPost->ID ); ?>">
+                    <h3 class="joq-catblock__item-title"><?php echo get_the_title( $rowPost->ID ); ?></h3>
+                    <div class="joq-catblock__meta">
+                      <time datetime="<?php echo get_the_date( 'c', $rowPost->ID ); ?>"><?php echo joq_time_ago( $rowPost ); ?></time>
+                      &middot; <?php echo joq_read_time( $rowPost ); ?> min lexim
+                    </div>
+                  </a>
+                  <?php endforeach; ?>
                 </div>
-                <div class="article-title">
-                  <?php echo the_title(); ?>
+
+              </div>
+            </section>
+
+            <?php
+              /* one mobile slot after every second block; see $joq_mobile_ads above */
+              if ( $joq_ad_i < count( $joq_mobile_ads ) && $joq_bi % 2 === 0 ) :
+            ?>
+            <div class="joq-feed-ad mobile-only">
+              <span class="joq-feed-ad__label">Reklam&euml;</span>
+              <div class="adunit-1" data-adunit="<?php echo $joq_mobile_ads[ $joq_ad_i ]; ?>" data-dimensions="300x100"></div>
+            </div>
+            <?php $joq_ad_i++; endif; ?>
+
+            </div><?php /* .joq-cycle */ ?>
+            <?php endforeach; ?>
+
+            <?php if ( count( $joq_blocks ) > 1 ) : ?>
+            <div class="joq-feed__more">
+              <button type="button" class="joq-category__load-btn joq-feed__more-btn">M&euml; shum&euml;</button>
+            </div>
+            <?php endif; ?>
+
+            <?php /* too few categories to space them all out: keep the rest so the page still carries every unit */ ?>
+            <?php while ( $joq_ad_i < count( $joq_mobile_ads ) ) : ?>
+            <div class="joq-feed-ad mobile-only">
+              <span class="joq-feed-ad__label">Reklam&euml;</span>
+              <div class="adunit-1" data-adunit="<?php echo $joq_mobile_ads[ $joq_ad_i ]; ?>" data-dimensions="300x100"></div>
+            </div>
+            <?php $joq_ad_i++; endwhile; ?>
+
+            <?php
+              /* The load-more endpoint serves the "aktualitet" category by
+                 offset, so start past however many of those the page already
+                 used. The click handler also drops any repeat it still gets. */
+              $joq_akt_used = 0;
+              foreach ( $joq_shown as $shownId ) {
+                if ( has_category( 'aktualitet', $shownId ) ) { $joq_akt_used++; }
+              }
+            ?>
+
+            <!-- Load more appends here; shown only while the last page is open -->
+            <div class="joq-feed__tail">
+            <div class="joq-stories" id="joq-more-stories"></div>
+            <div class="joq-load-more">
+              <button type="button" class="joq-category__load-btn load-more-home-button"
+                      data-label="M&euml; shum&euml;" data-loading="Duke ngarkuar&hellip;">M&euml; shum&euml;</button>
+            </div>
+            <script type="text/javascript">
+              (function () {
+                var btn = document.querySelector('.load-more-home-button');
+                if (!btn) { return; }
+                var featuredOffset = <?php echo (int) $joq_akt_used; ?>, topOffset = 4, lastOffset = 11;
+                var label   = btn.getAttribute('data-label');
+                var loading = btn.getAttribute('data-loading');
+
+                /* The endpoint returns a category name, not a slug, so match the
+                   icon by name. Keys are lower-cased because the name's casing is
+                   whatever the editor typed. */
+                var catIcons = <?php
+                  $joq_icon_map = array();
+                  foreach ( get_categories( array( 'hide_empty' => false ) ) as $joq_term ) {
+                    $joq_icon_url = joq_cat_icon( $joq_term->slug );
+                    if ( $joq_icon_url ) {
+                      $joq_icon_map[ mb_strtolower( $joq_term->name ) ] = $joq_icon_url;
+                    }
+                  }
+                  echo wp_json_encode( $joq_icon_map );
+                ?>;
+
+                /* Every permalink already on the page, so a story the endpoint
+                   hands back a second time is skipped instead of repeated. */
+                var seen = {};
+                Array.prototype.forEach.call(document.querySelectorAll('.joq-home-split__main a[href], .joq-hero a[href]'), function (a) {
+                  seen[a.getAttribute('href')] = true;
+                });
+
+                function reset() {
+                  btn.disabled = false;
+                  btn.classList.remove('is-loading');
+                  btn.innerHTML = label;
+                }
+
+                btn.addEventListener('click', function () {
+                  btn.disabled = true;
+                  btn.classList.add('is-loading');
+                  btn.innerHTML = loading;
+
+                  $.get('https://admin.joq-albania.com/more-home?featuredOffset=' + featuredOffset + '&topOffset=' + topOffset + '&lastOffset=' + lastOffset, function (data) {
+                    featuredOffset += 6;
+                    topOffset += 4;
+                    lastOffset += 14;
+
+                    try {
+                      /* jQuery already parses the body when the endpoint sends a JSON content type */
+                      var items = (typeof data === 'string') ? JSON.parse(data) : data;
+
+                      (items.featured || []).forEach(function (article) {
+                        if (seen[article.link]) { return; }
+                        seen[article.link] = true;
+                        var catIcon = article.cat ? catIcons[String(article.cat).toLowerCase()] : '';
+                        var kicker = article.cat
+                          ? '<span class="joq-story__kicker">' +
+                              (catIcon ? '<img class="joq-story__kicker-icon" src="' + catIcon +
+                                         '" alt="" width="144" height="144" loading="lazy" decoding="async">' : '') +
+                              article.cat + '</span>' : '';
+                        var excerpt = article.excerpt
+                          ? '<p class="joq-story__excerpt">' + article.excerpt + '</p>' : '';
+                        var meta = [article.time_ago || article.post_date || '',
+                                    article.read_time ? article.read_time + ' min lexim' : '']
+                                   .filter(Boolean).join(' · ');
+                        $('#joq-more-stories').append('<article class="joq-story">' +
+                          '<a href="' + article.link + '">' +
+                            '<div class="joq-story__body">' + kicker +
+                              '<h3 class="joq-story__title">' + article.title + '</h3>' + excerpt +
+                              '<div class="joq-story__meta">' + meta + '</div>' +
+                            '</div>' +
+                            '<div class="joq-story__media"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                          '</a></article>');
+                      });
+
+                      var n = $('.loadTopNews .joq-trending__item').not('.is-skeleton').length;
+                      (items.top || []).forEach(function (article) {
+                        n++;
+                        $('.loadTopNews').append('<article class="joq-trending__item">' +
+                          '<a href="' + article.link + '">' +
+                            '<div class="joq-trending__top">' +
+                              '<span class="joq-trending__num">' + String(n).padStart(2, '0') + '</span>' +
+                              '<div class="joq-trending__img"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                            '</div>' +
+                            '<div class="joq-trending__title">' + article.title + '</div>' +
+                          '</a></article>');
+                      });
+
+                      (items.last || []).forEach(function (article) {
+                        $('#joq-last-list').append('<a class="joq-post__sidebar-article" href="' + article.link + '">' +
+                          '<div class="joq-post__sidebar-img"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                          '<div class="joq-post__sidebar-body">' +
+                            '<div class="joq-post__sidebar-title">' + article.title + '</div>' +
+                            '<div class="joq-post__sidebar-time">' + (article.time_ago || article.cat || '') + '</div>' +
+                          '</div></a>');
+                      });
+                    } catch (e) {
+                      console.log(e);
+                      btn.remove();
+                      return;
+                    }
+
+                    if (topOffset > 9) { btn.remove(); return; }
+                    reset();
+                  }).fail(function () { btn.remove(); });
+                });
+              })();
+            </script>
+            </div><?php /* .joq-feed__tail */ ?>
+
+          </div>
+
+          <?php /* One cycle is on screen at a time now, so the rail is sized to sit
+                   beside it: just "Të fundit". Most-read and the remaining 300x250s
+                   moved to the full-width band below, where they no longer stretch
+                   this row far past the column next to it. */ ?>
+          <aside class="joq-rail">
+
+          <div class="joq-latest">
+            <div class="joq-section__header">
+              <h2 class="joq-section__title">T&euml; fundit</h2>
+              <a class="joq-section__more" href="/kategori/lajme.html">Shiko t&euml; gjitha &rarr;</a>
+            </div>
+            <div id="joq-last-list">
+            <?php
+                $i = 0;
+                $argsQuery = array(
+                  'post_type'        => 'post',
+                  'posts_per_page'   => 7,
+                  'post_status'      => 'publish',
+                  'category__not_in' => $joq_excluded,
+                  'post__not_in'     => $joq_rail_exclude,
+                );
+              $lastHeadlines = new WP_Query( $argsQuery );
+                while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
+                  $i++;
+                  $joq_shown[] = get_the_ID();
+
+                  if($i === 3) { ?>
+                    <div class="joq-latest__ad pc-only">
+                        <div class="adunit-1" data-adunit="joq__300x250-8" data-dimensions="300x250" style="width:300px;"></div>
+                    </div>
+                  <?php
+                  }
+
+                  if($i === 4) {
+                  ?>
+                    <div class="joq-latest__ad pc-only">
+                        <div class="adunit-1" data-adunit="joq__300x250-4" data-dimensions="300x250" style="width:300px;"></div>
+                    </div>
+                  <?php
+                  }
+
+                  if($i === 6) {
+                  ?>
+                  <div class="joq-latest__ad mob-pc-banner-wrapper">
+                      <a href="https://aleancaetike.media/decent-invest-offer-easily/" target="_blank">
+                          <img style="width: 100%; max-width:300px;" src="/b/ame/300x260/2020-27-10.jpg" alt="" />
+                      </a>
+                  </div>
+                  <?php
+                  }
+              ?>
+              <a class="joq-post__sidebar-article" href="<?php echo get_permalink(); ?>">
+                <?php $railImg = fix_post_thumbnail( get_the_post_thumbnail_url( get_the_ID(), 'img2' ) ); ?>
+                <div class="joq-post__sidebar-img">
+                  <?php if ( $railImg ) : ?>
+                  <img src="<?php echo $railImg; ?>" alt="" width="527" height="375" loading="lazy" decoding="async" />
+                  <?php endif; ?>
+                </div>
+                <div class="joq-post__sidebar-body">
+                  <div class="joq-post__sidebar-title"><?php echo get_the_title(); ?></div>
+                  <div class="joq-post__sidebar-time">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><?php echo joq_time_ago(); ?>
+                  </div>
                 </div>
               </a>
-              <div style="clear: both;"></div>
+              <?php endwhile; wp_reset_postdata(); ?>
             </div>
-
-            <?php endwhile; wp_reset_postdata(); ?>
-          <!-- /last news -->
-
           </div>
+
+          <?php /* Sticky: the feed grows as the reader presses "Më shumë", so this
+                   follows them down instead of letting the column run dry. */ ?>
+          <div class="joq-rail__sticky pc-only">
+            <div class="adunit-1" data-adunit="joq__300x250-bottomRight" data-dimensions="300x250"></div>
+          </div>
+
+          </aside>
+
         </div>
-        <!-- End Home Last News -->
+      </section>
+      <!-- End Aktualitet + Të fundit -->
 
+      <!-- Ad band -->
+      <div class="joq-adrow pc-only">
+        <span class="joq-adrow__label">Reklam&euml;</span>
+        <div class="adunit-1" data-adunit="joq__PC-300x250-11" data-dimensions="300x250"></div>
+        <div class="adunit-1" data-adunit="joq__300x250-9" data-dimensions="300x250"></div>
       </div>
 
-      <!-- Load More Button -->
-      <div style="text-align: center;">
-        <div class="load-more-home-button">
-        M&euml; shum&euml;
-      </div>
-      <script async type="text/javascript">
-        let featuredOffset = 7;
-        let topOffset = 4;
-        let lastOffset = 11;
-        $('.load-more-home-button').on('click', function() {
-          $('.load-more-home-button').hide();
-          
-          $.get( "https://admin.joq-albania.com/more-home?featuredOffset="+featuredOffset+"&topOffset="+topOffset+"&lastOffset="+lastOffset+"", function( data ) {
-
-              featuredOffset += 6;
-              topOffset += 4;
-              lastOffset += 14;
-
-              if (topOffset > 9) {
-                $('.load-more-home-button').remove();
-              }
-
-            try {
-
-              const items = JSON.parse(data);
-              const featured = items.featured;
-              const top = items.top;
-              const last = items.last;
-
-              for (const article of featured) {
-                $('.home-featured').append(`<div class="article-wrapper">
-                    <a href="${article.link}">
-                      <div class="article-image">
-                        <img src="${article.image}" alt="${article.title}">
-                      </div>
-                      <div class="article-title">
-                        ${article.title}              
-                      </div>
-                    </a>
-                    <a class="article-cat-link" href="https://joq-albania.com/kategori/${article.cat_slug}.html">
-                      <div class="article-cat">${article.cat}</div>
-                    </a>
-                  </div>`); 
-              }
-              for (const article of top) {
-                $('.loadTopNews').append(`<div class="article-wrapper">
-                    <a href="${article.link}">
-                      <div class="article-image">
-                        <img src="${article.image}" alt="${article.title}">
-                      </div>
-                      <div class="article-title">
-                        ${article.title}              
-                      </div>
-                    </a>
-                    <a class="article-cat-link" href="https://joq-albania.com/kategori/${article.cat_slug}.html">
-                      <div class="article-cat">${article.cat}</div>
-                    </a>
-                  </div>`); 
-              }
-              for (const article of last) {
-                $('.home-last-news .article-wrapper').append(`<div class="last-news-article-wrapper">
-                    <a href="${article.link}" title="${article.title}">
-                      <div class="article-image" style="background-image: url(${article.image});">
-                      </div>
-                      <div class="article-title">
-                        ${article.title}
-                      </div>
-                    </a>
-                    <div style="clear: both;"></div>
-                  </div>`); 
-              }
-
-              $('.load-more-home-button').show();
-                
-            } catch(e) {
-                console.log(e);
-                $('.load-more-home-button').remove();
-            }
-            
+      <!-- Most read: skeleton cards hold the space until the AJAX fragment lands -->
+      <section class="joq-section" data-animate>
+        <div class="joq-section__header">
+          <h2 class="joq-section__title">M&euml; t&euml; lexuarat</h2>
+        </div>
+        <div class="loadTopNews joq-trending" aria-busy="true">
+          <?php for ( $sk = 1; $sk <= 4; $sk++ ) : ?>
+          <div class="joq-trending__item is-skeleton" aria-hidden="true">
+            <div class="joq-trending__top">
+              <span class="joq-trending__num"><?php echo str_pad( $sk, 2, '0', STR_PAD_LEFT ); ?></span>
+              <div class="joq-trending__img"></div>
+            </div>
+            <div class="joq-trending__title"><span></span><span></span></div>
+          </div>
+          <?php endfor; ?>
+        </div>
+        <script type="text/javascript">
+          $.get( "/myAjax/top-news2.html", function( data ) {
+            $( ".loadTopNews" ).html( data ).attr( "aria-busy", "false" );
           });
-        });
-      </script>
-      </div>
-    <!-- End Load More Button -->
+        </script>
+      </section>
 
-    <script async type="text/javascript">
-      // Home Content Tabs
-        $('.mobile-controller-item').on('click', function() {
-            $('.mobile-controller-item').removeClass('active');
-            $(this).addClass('active');
-            $('.home-content-item').hide();
-            $('.'+ $(this).data('item') +'').show();
-        });
-        // End Home Content Tabs
-    </script>
-
-    <!-- Download JOQ App -->
-    <div class="download-app mobile-only" style="margin-top: 25px;">
-      <div class="download-app-title">
-        Shkarkoni aplikacionin JOQ ALBANIA në platformat
-      </div>
-      <div class="download-app-buttons">
-        <a href="https://itunes.apple.com/al/app/joq-al/id1224913299?mt=8" target="_blank">
-          <div class="download-app-button">
-            <div class="download-app-icon">
-              <svg viewBox="0 0 512 512">
-                <g>
-                  <path d="M185.255,512c-76.201-0.439-139.233-155.991-139.233-235.21c0-129.404,97.075-157.734,134.487-157.734   c16.86,0,34.863,6.621,50.742,12.48c11.104,4.087,22.588,8.306,28.975,8.306c3.823,0,12.832-3.589,20.786-6.738   c16.963-6.753,38.071-15.146,62.651-15.146c0.044,0,0.103,0,0.146,0c18.354,0,74.004,4.028,107.461,54.272l7.837,11.777   l-11.279,8.511c-16.113,12.158-45.513,34.336-45.513,78.267c0,52.031,33.296,72.041,49.292,81.665   c7.061,4.248,14.37,8.628,14.37,18.208c0,6.255-49.922,140.566-122.417,140.566c-17.739,0-30.278-5.332-41.338-10.034   c-11.191-4.761-20.845-8.862-36.797-8.862c-8.086,0-18.311,3.823-29.136,7.881C221.496,505.73,204.752,512,185.753,512H185.255z"/>
-                  <path d="M351.343,0c1.888,68.076-46.797,115.304-95.425,112.342C247.905,58.015,304.54,0,351.343,0z"/>
-                </g>
-              </svg>
-            </div>
-            <div class="download-app-text">
-              <div class="download-app-text1">
-                Shkarko për
-              </div>
-              <div class="download-app-text2">
-                Apple iOS
-              </div>
-            </div>
-          </div>
-            </a>
-
-            <a href="https://play.google.com/store/apps/details?id=com.joqAlbania.al" target="_blank">
-          <div class="download-app-button">
-            <div class="download-app-icon">
-              <svg viewBox="0 0 512 512" class="android-svg">
-                <g>
-                  <path xmlns="http://www.w3.org/2000/svg" d="M322.041,43.983l23.491-36.26c1.51-2.287,0.841-5.414-1.467-6.903     c-2.286-1.51-5.414-0.884-6.903,1.467l-24.353,37.512c-18.27-7.485-38.676-11.691-60.226-11.691     c-21.571,0-41.934,4.206-60.247,11.691l-24.31-37.512c-1.488-2.351-4.638-2.977-6.946-1.467     c-2.308,1.488-2.977,4.616-1.467,6.903l23.512,36.26c-42.387,20.773-70.968,59.924-70.968,104.834     c0,2.761,0.173,5.479,0.41,8.175h280.053c0.237-2.696,0.388-5.414,0.388-8.175C393.009,103.907,364.406,64.756,322.041,43.983z      M187.655,108.911c-7.442,0-13.482-5.997-13.482-13.46c0-7.463,6.04-13.439,13.482-13.439c7.485,0,13.482,5.975,13.482,13.439     S195.097,108.911,187.655,108.911z M317.49,108.911c-7.442,0-13.482-5.997-13.482-13.46c0-7.463,6.04-13.439,13.482-13.439     c7.463,0,13.46,5.975,13.46,13.439C330.95,102.914,324.953,108.911,317.49,108.911z"/>
-                </g>
-              </svg>
-            </div>
-            <div class="download-app-text">
-              <div class="download-app-text1">
-                Shkarko për
-              </div>
-              <div class="download-app-text2">
-                Android
-              </div>
-            </div>
-          </div>
+      <!-- Report CTA -->
+      <section class="joq-report" data-animate>
+        <span class="joq-report__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </span>
+        <div class="joq-report__text">
+          <div class="joq-report__title">Ke nj&euml; lajm? Na shkruaj!</div>
+          <div class="joq-report__sub">D&euml;rgo foto, video ose denoncimin t&euml;nd direkt n&euml; redaksi. Z&euml;ri yt ka r&euml;nd&euml;si.</div>
+        </div>
+        <a class="joq-report__btn" href="https://wa.me/+355699299998" target="_blank" rel="noopener">
+          D&euml;rgo tani
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-      </div>
-    </div>
-    <!-- End Download JOQ App -->
-
-    <!-- Home Vec e Jona -->
-    <div class="home-category-wrapper">
-      <div class="home-category-title">
-        Veç e jona
-      </div>
-      <!-- te zgjedhura -->
-      <?php
-        $lastHeadlines = new WP_query('type=post&posts_per_page=5&category_name=vec-e-jona');
-        while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
-      ?>
-      <div class="home-category-article">
-        <div class="home-category-image">
-          <a 
-          title="<?php echo the_title(); ?>"
-              target="_self"
-            style="background-image: url('<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>')" 
-            href="<?php echo get_permalink() ?>">
-          </a>
-        </div>
-        <div class="home-category-post">
-          <a href="<?php echo get_permalink() ?>">
-            <div class="home-category-post-title">
-                          <?php echo the_title(); ?>
-            </div>
-            <div class="home-category-post-description pc-only">
-              <?php $text = wp_strip_all_tags(get_the_content()); echo wp_trim_words( $text, 40, '...' ); ?>
-            </div>
-            <div class="home-category-post-author">
-                          Shkruar nga: <?php echo get_the_author_meta('first_name') ?> <?php echo get_the_author_meta('last_name') ?> | Publikuar më: <?php echo  get_the_date( 'd.m.Y, H:i' );?>
-            </div>
-          </a>
-        </div>
-      </div>
-          <?php endwhile; wp_reset_postdata(); ?>
-      
-      
-      
-    </div>
-    <!-- End Home Vec e Jona -->
-
-    </div>
-
-    <!-- Footer -->
-    <div class="footer-wrapper">
-      <div class="container footer">
-
-        <!-- Footer Socials -->
-        <div class="footer-socials">
-          <a href="https://www.youtube.com/channel/UCVsMVFcGZgxXTl5A-usiIBQ/?sub_confirmation=1" target="_blank" title="youtube">
-            <div class="footer-social-item youtube">
-              <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
-            </div>
-          </a>
-          <a href="https://twitter.com/JoqAlbania" target="_blank" title="twitter">
-            <div class="footer-social-item twitter">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
+        <div class="joq-report__badges">
+          <div class="joq-report__badge">
+            <span class="joq-report__badge-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            Anonimitet i sigurt
           </div>
-          </a>
-          <a href="https://www.facebook.com/joqalbania/" target="_blank" title="facebook">
-            <div class="footer-social-item facebook">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
+          <div class="joq-report__badge">
+            <span class="joq-report__badge-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+            Raportim i shpejt&euml;
           </div>
-          </a>
-          <a href="https://www.instagram.com/joqalbania/" target="_blank" title="instagram">
-            <div class="footer-social-item instagram">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
-          </div>
-          </a>
-          <a href="#" title="whatsapp">
-            <div class="footer-social-item whatsapp">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
-          </div>
-          </a>
-          <a href="#" title="tiktok">
-            <div class="footer-social-item tiktok">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
-          </div>
-          </a>
-          <a href="#" title="snapchat">
-            <div class="footer-social-item snapchat">
-            <img src="https://static.joq-albania.com/imagesNew/2021/09/Home-Desktop.jpg">
-          </div>
-          </a>
-        </div>
-        <!-- End Footer Socials -->
-
-        <!-- Dergo materialin tend -->
-        <div class="footer-dergo-materialin">
-          <div class="footer-dergo-materialin-button">
-            <a href="https://wa.me/+355699299998">Dërgo materialin tënd këtu</a>
-            <svg viewBox="0 0 512.002 512.002">
-            <g>
-              <g>
-                <path d="M388.425,241.951L151.609,5.79c-7.759-7.733-20.321-7.72-28.067,0.04c-7.74,7.759-7.72,20.328,0.04,28.067l222.72,222.105    L123.574,478.106c-7.759,7.74-7.779,20.301-0.04,28.061c3.883,3.89,8.97,5.835,14.057,5.835c5.074,0,10.141-1.932,14.017-5.795    l236.817-236.155c3.737-3.718,5.834-8.778,5.834-14.05S392.156,245.676,388.425,241.951z"/>
-              </g>
-            </g>
-          </svg>
+          <div class="joq-report__badge">
+            <span class="joq-report__badge-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            N&euml; sh&euml;rbim t&euml; qytetar&euml;ve
           </div>
         </div>
-        <!-- End Dergo materialin tend -->
+      </section>
+      <!-- End Report CTA -->
 
-        <!-- Footer Menu -->
-        <div class="footer-menu">
-          <ul>
-                  <li>
-                      <a href="/faqe/puno-me-ne.html"> Puno me ne! </a>
-                  </li>
-                  <li>
-                      <a href="/faqe/reklamo.html">Marketing </a>
-                  </li>
-                  <li>
-                      <a href="/faqe/politika-e-privatesise.html"> Politika e privatësisë </a>
-                  </li>
-            <li>
-                      <a href="/faqe/rreth-nesh.html"> Rreth Nesh </a>
-                  </li>
-                  <li>
-                      <a href="/faqe/kushtet-e-perdorimit.html"> Kushtet e përdorimit </a>
-                  </li>
-                  <li>
-                      <a href="/faqe/kontakto.html"> Kontakt </a>
-                  </li>
-          </ul>
+      <!-- Home Vec e Jona -->
+      <section class="joq-section joq-section--accent" data-animate>
+        <div class="joq-section__header">
+          <h2 class="joq-section__title"><?php echo joq_cat_icon_img( 'vec-e-jona', 'joq-section__title-icon' ); ?>Ve&ccedil; e jona</h2>
+          <a class="joq-section__more" href="/kategori/vec-e-jona.html">T&euml; gjitha &rarr;</a>
         </div>
-        <!-- End Footer Menu -->
 
-      </div>
-    </div>
-    <!-- End Footer -->
+        <div>
+        <?php
+          $vecNum = 0;
+          $lastHeadlines = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => 5, 'post_status' => 'publish', 'category_name' => 'vec-e-jona' ) );
+          while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
+            $vecNum++;
+        ?>
+          <article class="joq-list__item">
+            <a href="<?php echo get_permalink(); ?>">
+              <span class="joq-list__num"><?php echo $vecNum; ?></span>
+              <?php $vecImg = fix_post_thumbnail( get_the_post_thumbnail_url( get_the_ID(), 'img2' ) ); ?>
+              <div class="joq-list__img">
+                <?php if ( $vecImg ) : ?>
+                <img src="<?php echo $vecImg; ?>" alt="" width="527" height="375" loading="lazy" decoding="async" />
+                <?php endif; ?>
+              </div>
+              <div class="joq-list__body">
+                <h3 class="joq-list__title"><?php echo get_the_title(); ?></h3>
+                <p class="joq-list__excerpt"><?php $text = wp_strip_all_tags( get_the_content() ); echo wp_trim_words( $text, 40, '...' ); ?></p>
+                <div class="joq-list__meta">
+                  Shkruar nga: <?php echo get_the_author_meta('first_name') ?> <?php echo get_the_author_meta('last_name') ?> | Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i' );?>
+                </div>
+              </div>
+            </a>
+          </article>
+        <?php endwhile; wp_reset_postdata(); ?>
+        </div>
+      </section>
+      <!-- End Home Vec e Jona -->
+
+    </main>
+
+<?php get_template_part( 'templates/joqFooter' ); ?>
 
     <a href="https://wa.me/+355699299998" id="whatsapp-button" class="mobile-only">
         <img width="24px" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg">
     </a>
 
-    <button id="back-to-top" class="mobile-only" >
-      <svg style="width: 16px; transform: rotate(90deg);fill: #fff;" viewBox="0 0 32 32"><g data-name="Layer 2" id="Layer_2"><path class="cls-1" d="M15.12,15.53,25,5.66a1,1,0,0,1,1.41,1.41l-9.06,9.06,8.8,8.8a1,1,0,0,1,0,1.41h0a1,1,0,0,1-1.42,0l-9.61-9.61A.85.85,0,0,1,15.12,15.53Z"/><path class="cls-1" d="M5.54,15.53l9.88-9.87a1,1,0,1,1,1.41,1.41L7.77,16.13l8.8,8.8a1,1,0,0,1,0,1.41h0a1,1,0,0,1-1.41,0L5.54,16.73A.85.85,0,0,1,5.54,15.53Z"/></g></svg>
-    </button>
 
   <!-- Swiper JS -->
   <script src="https://static.joq-albania.com/assets/js/swiper-bundle.min.js" type="text/javascript"></script>
   <script async type="text/javascript">
-      // Main Image resizer
-      let width = $(window).width();
-      let height = $('.home-headline-img').height(0.3 * width);
-
-      $(window).resize(function () {
-          width = $(window).width();
-          height = $('.home-headline-img').height(0.3 * width);
-      });
-      // End main image resizer
-      // Swiper
       var swiper = new Swiper(".mySwiper", {
           spaceBetween: 0,
           loop: true,
@@ -1051,6 +833,7 @@ global $generateLastNewsSys;
   <script async src="https://static.joq-albania.com/assets/js/bannersys.js?v=2.05" type="text/javascript"></script>
 
 
+    <script src="/wp-content/themes/joq/assets/js/joq-design-system.js?v=3.7"></script>
 </body>
 
 </html>
