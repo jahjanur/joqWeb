@@ -488,3 +488,172 @@ add_action('admin_head', 'my_custom_admin_css_inline');
 
 
 
+
+/**
+ * Albanian relative time for the homepage "Të fundit" list and trending strip.
+ * human_time_diff() returns English ("20 mins"), so this formats it locally:
+ * "tani", "5 min më parë", "3 orë më parë", then the date once it's older than a day.
+ */
+function joq_time_ago( $post = null ) {
+    $post = get_post( $post );
+    if ( ! $post ) {
+        return '';
+    }
+    $then = get_post_time( 'U', true, $post );
+    $diff = max( 0, current_time( 'timestamp', true ) - $then );
+
+    if ( $diff < MINUTE_IN_SECONDS ) {
+        return 'tani';
+    }
+    if ( $diff < HOUR_IN_SECONDS ) {
+        return floor( $diff / MINUTE_IN_SECONDS ) . ' min më parë';
+    }
+    if ( $diff < DAY_IN_SECONDS ) {
+        $h = floor( $diff / HOUR_IN_SECONDS );
+        return $h . ( $h === 1.0 ? ' orë më parë' : ' orë më parë' );
+    }
+    return get_the_date( 'd.m.Y, H:i', $post );
+}
+
+/**
+ * Reading time in whole minutes at 200 words/min, never less than 1.
+ * str_word_count() miscounts Albanian diacritics, so count Unicode letter runs.
+ */
+function joq_read_time( $post = null ) {
+    $post = get_post( $post );
+    if ( ! $post ) {
+        return 1;
+    }
+    $text  = wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+    $words = preg_match_all( '/[\p{L}\p{N}]+/u', $text );
+    return max( 1, (int) ceil( $words / 200 ) );
+}
+
+/** Cache-bust for the category icon files; bump when one is re-exported. */
+if ( ! defined( 'JOQ_ICON_VER' ) ) {
+    define( 'JOQ_ICON_VER', '2' );
+}
+
+/**
+ * URL of the tile icon for a category slug, or '' when there is none.
+ *
+ * Same 144px WebP set the homepage category tiles use. Categories without an
+ * icon of their own (bota, kuriozitete, sondazhe, ...) fall back to the generic
+ * news mark so a kicker never renders half-dressed; an unknown slug with no file
+ * on disk returns '' and callers print the label alone.
+ */
+function joq_cat_icon( $slug ) {
+    static $map = array(
+        'aktualitet'           => 'albania-joq.webp',
+        'lajme'                => 'News-glass-joq.webp',
+        'kosova'               => 'Kosovo-glass-joq.webp',
+        'maqedoni'             => 'Macedonia-glass-joq.webp',
+        'sport'                => 'ball-joq.webp',
+        'vec-e-jona'           => 'vip-joq.webp',
+        'persekutimi-ndaj-joq' => 'preskeutim-joq.webp',
+        'argetim'              => 'argetimm-joq.webp',
+        'teknologji'           => 'teknologji-joq.webp',
+    );
+
+    $slug = strtolower( (string) $slug );
+    $file = isset( $map[ $slug ] ) ? $map[ $slug ] : 'News-glass-joq.webp';
+
+    if ( ! file_exists( get_template_directory() . '/assets/images/icons/' . $file ) ) {
+        return '';
+    }
+    /* JOQ_ICON_VER changes when an icon file is re-exported under the same name
+       (News-glass lost its baked-in white background), so caches let go of it. */
+    return get_template_directory_uri() . '/assets/images/icons/' . $file . '?v=' . JOQ_ICON_VER;
+}
+
+/**
+ * <img> for a category's tile icon, or '' when the category has no file.
+ * Sized in CSS (1em), so the class decides how big it lands.
+ */
+function joq_cat_icon_img( $slug, $class ) {
+    $url = joq_cat_icon( $slug );
+    if ( ! $url ) {
+        return '';
+    }
+    return '<img class="' . esc_attr( $class ) . '" src="' . esc_url( $url )
+         . '" alt="" width="144" height="144" loading="lazy" decoding="async" />';
+}
+
+/**
+ * Post IDs ranked by yesterday's pageviews, newest ranking first.
+ *
+ * Same Elasticsearch aggregation pages/top-news.php uses for the site-wide
+ * "Më të lexuarat" fragment, but asks for a deep list so callers can narrow it
+ * (to one category, say) and still have four left. Cached in a transient: the
+ * pages that call this are written to disk, yet a regeneration sweep would
+ * otherwise hit the API once per page.
+ *
+ * Returns array() on any failure — callers must cope with an empty list rather
+ * than assume four IDs.
+ */
+function joq_popular_post_ids( $size = 120 ) {
+    $key    = 'joq_popular_ids_' . (int) $size;
+    $cached = get_transient( $key );
+    if ( is_array( $cached ) ) {
+        return $cached;
+    }
+
+    $body = wp_json_encode( array(
+        'from'  => 0,
+        'size'  => 0,
+        'query' => array( 'range' => array( '@timestamp' => array( 'gte' => 'now-1d/d', 'lte' => 'now' ) ) ),
+        'aggs'  => array( 'popular_news' => array( 'terms' => array( 'field' => 'post.ID', 'size' => (int) $size ) ) ),
+    ) );
+
+    $ch = curl_init( 'https://dynamic2.joq-albania.com/search-event' );
+    curl_setopt_array( $ch, array(
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_HTTPHEADER     => array( 'Content-Type: application/json', 'Content-Length: ' . strlen( $body ) ),
+        CURLOPT_POSTFIELDS     => $body,
+        CURLOPT_RETURNTRANSFER => true,
+        /* The category pages are generated in a loop; a hanging API must not
+           stall the sweep. */
+        CURLOPT_CONNECTTIMEOUT => 3,
+        CURLOPT_TIMEOUT        => 6,
+    ) );
+    $response = curl_exec( $ch );
+    $failed   = curl_errno( $ch );
+    curl_close( $ch );
+
+    $ids = array();
+    if ( ! $failed ) {
+        $data = json_decode( $response );
+        if ( isset( $data->aggregations->popular_news->buckets ) && is_array( $data->aggregations->popular_news->buckets ) ) {
+            foreach ( $data->aggregations->popular_news->buckets as $bucket ) {
+                $ids[] = (int) $bucket->key;
+            }
+        }
+    }
+
+    /* Cache the empty result too, briefly, so an outage is not amplified. */
+    set_transient( $key, $ids, $ids ? 10 * MINUTE_IN_SECONDS : 2 * MINUTE_IN_SECONDS );
+    return $ids;
+}
+
+/**
+ * The most-read posts that belong to one category, ranked by readership.
+ * Fewer than $limit — including none — is a normal result for a quiet category.
+ */
+function joq_popular_posts_in_category( $cat_id, $limit = 4 ) {
+    $ids = joq_popular_post_ids();
+    if ( ! $ids || ! $cat_id ) {
+        return array();
+    }
+    $q = new WP_Query( array(
+        'post_type'           => 'post',
+        'post_status'         => 'publish',
+        'post__in'            => $ids,
+        'orderby'             => 'post__in',
+        'cat'                 => (int) $cat_id,
+        'posts_per_page'      => (int) $limit,
+        'ignore_sticky_posts' => true,
+        'no_found_rows'       => true,
+    ) );
+    return $q->posts;
+}
