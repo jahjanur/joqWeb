@@ -42,8 +42,18 @@ input{font:inherit}
   --gray-900: #1a1a1a;
   --font: 'Hurme4', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --max-w: 1180px;
+  /* Shown wherever an image or an ad has not painted — missing, still loading or failed. */
+  --joq-fallback: url('/wp-content/themes/joq/assets/images/LightFullLogo800x200.svg');
   --ease: cubic-bezier(.4, 0, .2, 1);
   --ease-out: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* iOS Safari still pans the html element when only body clips, which is what let
+   a wide ad creative drag the whole page sideways. Clipping the root fixes it but
+   also stops position:sticky working, so scope it to the widths where the rail is
+   not sticky anyway (it goes static at 1024px). Desktop keeps the default root. */
+@media (max-width: 1024px) {
+  html { overflow-x: clip; }
 }
 
 body {
@@ -63,45 +73,49 @@ body.menu-open { overflow: hidden; }
 /* ==========================================================================
    SCROLL ANIMATIONS
    ========================================================================== */
-[data-animate] {
+/* Scoped to .joq-js, which the design-system script sets on <html> before
+   paint. Unscoped, a single third-party script error anywhere on the page
+   would leave every [data-animate] section stuck at opacity:0 — a blank
+   homepage. With the guard, no JS simply means no reveal animation. */
+.joq-js [data-animate] {
   opacity: 0;
   transform: translateY(30px);
   transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
 }
-[data-animate].visible {
+.joq-js [data-animate].visible {
   opacity: 1;
   transform: translateY(0);
 }
-[data-animate] .joq-card,
-[data-animate] .joq-featured-card,
-[data-animate] .joq-list__item {
+.joq-js [data-animate] .joq-card,
+.joq-js [data-animate] .joq-featured-card,
+.joq-js [data-animate] .joq-list__item {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity .5s var(--ease-out), transform .5s var(--ease-out);
 }
-[data-animate].visible .joq-card,
-[data-animate].visible .joq-featured-card,
-[data-animate].visible .joq-list__item {
+.joq-js [data-animate].visible .joq-card,
+.joq-js [data-animate].visible .joq-featured-card,
+.joq-js [data-animate].visible .joq-list__item {
   opacity: 1;
   transform: translateY(0);
 }
-[data-animate].visible .joq-card:nth-child(1),
-[data-animate].visible .joq-featured-card:nth-child(1),
-[data-animate].visible .joq-list__item:nth-child(1) { transition-delay: .05s; }
-[data-animate].visible .joq-card:nth-child(2),
-[data-animate].visible .joq-featured-card:nth-child(2),
-[data-animate].visible .joq-list__item:nth-child(2) { transition-delay: .1s; }
-[data-animate].visible .joq-card:nth-child(3),
-[data-animate].visible .joq-featured-card:nth-child(3),
-[data-animate].visible .joq-list__item:nth-child(3) { transition-delay: .15s; }
-[data-animate].visible .joq-card:nth-child(4),
-[data-animate].visible .joq-featured-card:nth-child(4),
-[data-animate].visible .joq-list__item:nth-child(4) { transition-delay: .2s; }
-[data-animate].visible .joq-card:nth-child(5),
-[data-animate].visible .joq-list__item:nth-child(5) { transition-delay: .25s; }
-[data-animate].visible .joq-card:nth-child(6) { transition-delay: .3s; }
-[data-animate].visible .joq-card:nth-child(7) { transition-delay: .35s; }
-[data-animate].visible .joq-card:nth-child(8) { transition-delay: .4s; }
+.joq-js [data-animate].visible .joq-card:nth-child(1),
+.joq-js [data-animate].visible .joq-featured-card:nth-child(1),
+.joq-js [data-animate].visible .joq-list__item:nth-child(1) { transition-delay: .05s; }
+.joq-js [data-animate].visible .joq-card:nth-child(2),
+.joq-js [data-animate].visible .joq-featured-card:nth-child(2),
+.joq-js [data-animate].visible .joq-list__item:nth-child(2) { transition-delay: .1s; }
+.joq-js [data-animate].visible .joq-card:nth-child(3),
+.joq-js [data-animate].visible .joq-featured-card:nth-child(3),
+.joq-js [data-animate].visible .joq-list__item:nth-child(3) { transition-delay: .15s; }
+.joq-js [data-animate].visible .joq-card:nth-child(4),
+.joq-js [data-animate].visible .joq-featured-card:nth-child(4),
+.joq-js [data-animate].visible .joq-list__item:nth-child(4) { transition-delay: .2s; }
+.joq-js [data-animate].visible .joq-card:nth-child(5),
+.joq-js [data-animate].visible .joq-list__item:nth-child(5) { transition-delay: .25s; }
+.joq-js [data-animate].visible .joq-card:nth-child(6) { transition-delay: .3s; }
+.joq-js [data-animate].visible .joq-card:nth-child(7) { transition-delay: .35s; }
+.joq-js [data-animate].visible .joq-card:nth-child(8) { transition-delay: .4s; }
 
 
 /* ==========================================================================
@@ -135,7 +149,7 @@ body.menu-open { overflow: hidden; }
 }
 .joq-header__top-links a {
   font-size: 12px;
-  color: rgba(255,255,255,.45);
+  color: rgba(255,255,255,.7);
   transition: color .2s var(--ease);
 }
 .joq-header__top-links a:hover { color: var(--white); }
@@ -383,6 +397,10 @@ body.menu-open { overflow: hidden; }
   flex-direction: column;
   color: var(--white);
   width: 100%;
+  /* The promo column is stretched to the height of the link columns next to it.
+     Fill that height and centre the screen, or a taller link column leaves a
+     band of bare #0d0d0f under the card. */
+  height: 100%;
   transition: all .4s var(--ease);
   position: relative;
 }
@@ -392,8 +410,10 @@ body.menu-open { overflow: hidden; }
   position: relative;
   padding: 28px 24px 22px;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   background: #0d0d0f;
   overflow: hidden;
@@ -613,7 +633,8 @@ body.menu-open { overflow: hidden; }
   display: flex;
   gap: 48px;
   white-space: nowrap;
-  animation: tickerScroll 30s linear infinite;
+  animation: tickerScroll 40s linear infinite;
+  animation-duration: calc(var(--n, 8) * 5s);
 }
 .joq-ticker__item {
   font-size: 13px;
@@ -701,14 +722,26 @@ body.menu-open { overflow: hidden; }
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%;
   background: #0d0d0f;
-  z-index: 99;
+  /* Above .joq-header__nav (z-index 100), so the panel's own sticky header —
+     logo and close button — is not hidden behind the sticky nav bar. */
+  z-index: 102;
   transform: translateX(100%);
-  transition: transform .45s cubic-bezier(.22, 1, .36, 1);
+  /* Hidden as well as translated: position:fixed escapes body{overflow-x:hidden},
+     so the closed panel's leftward box-shadow would otherwise bleed a dark band
+     down the right edge of every page, and its links would stay keyboard- and
+     screen-reader-reachable at desktop widths. Delay visibility on the way out
+     so the slide-out animation still plays. */
+  visibility: hidden;
+  transition: transform .45s cubic-bezier(.22, 1, .36, 1), visibility 0s linear .45s;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-shadow: -24px 0 80px rgba(0,0,0,.4);
 }
-.joq-mobile-menu.open { transform: translateX(0); }
+.joq-mobile-menu.open {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform .45s cubic-bezier(.22, 1, .36, 1), visibility 0s linear 0s;
+}
 .joq-mobile-menu.open .joq-mobile-menu__link {
   animation: menuSlideIn .4s var(--ease-out) both;
   animation-delay: calc(.05s * var(--i, 0) + .12s);
@@ -726,7 +759,7 @@ body.menu-open { overflow: hidden; }
   background: rgba(0,0,0,.5);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  z-index: 98;
+  z-index: 101;
   opacity: 0;
   visibility: hidden;
   transition: all .35s var(--ease);
@@ -1110,7 +1143,15 @@ body.menu-open { overflow: hidden; }
 .joq-hero__slide:hover .joq-hero__read { opacity: 1; }
 
 /* Swiper */
-.joq-hero .swiper-pagination { bottom: 24px !important; }
+/* top:auto too — an absolutely positioned box with both top and bottom set
+   honours top, so any legacy .swiper-pagination{top:...} rule would otherwise
+   pin the dots to the top of the hero (seen on mobile). */
+.joq-hero .swiper-pagination { bottom: 24px !important; top: auto !important; }
+/* On a phone the dots share the bottom strip with the date line, so pin them
+   to the left gutter under the text instead of centred over it. */
+@media (max-width: 768px) {
+  .joq-hero .swiper-pagination { bottom: 16px !important; text-align: left; padding-left: 16px; }
+}
 .joq-hero .swiper-pagination-bullet {
   width: 8px; height: 8px;
   background: var(--white);
@@ -1170,6 +1211,17 @@ body.menu-open { overflow: hidden; }
   border-radius: 2px;
   flex-shrink: 0;
 }
+/* One em square, so it tracks the title through every breakpoint. The header's
+   12px gap is sized for the red bar; the icon belongs to the word next to it,
+   so it sits closer. */
+.joq-section__title-icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: block;
+  margin-right: -5px;
+}
 .joq-section__more {
   font-size: 13px;
   font-weight: 600;
@@ -1211,7 +1263,7 @@ body.menu-open { overflow: hidden; }
 .joq-card__img {
   overflow: hidden;
   aspect-ratio: 16/10;
-  background: var(--gray-100);
+  background-color: var(--gray-100);
   position: relative;
 }
 .joq-card--large .joq-card__img { aspect-ratio: 16/9; }
@@ -1255,7 +1307,7 @@ body.menu-open { overflow: hidden; }
   gap: 5px;
   margin-top: 12px;
   font-size: 12px;
-  color: var(--gray-500);
+  color: var(--gray-600);
 }
 .joq-card__time svg { opacity: .5; }
 
@@ -1285,7 +1337,7 @@ body.menu-open { overflow: hidden; }
 .joq-featured-card__img {
   overflow: hidden;
   aspect-ratio: 4/3;
-  background: var(--gray-100);
+  background-color: var(--gray-100);
   position: relative;
 }
 .joq-featured-card__img img {
@@ -1329,7 +1381,7 @@ body.menu-open { overflow: hidden; }
   display: block;
   margin-top: 8px;
   font-size: 12px;
-  color: var(--gray-500);
+  color: var(--gray-600);
 }
 
 
@@ -1353,7 +1405,7 @@ body.menu-open { overflow: hidden; }
 .joq-list__num {
   font-size: 36px;
   font-weight: 900;
-  color: var(--gray-200);
+  color: var(--gray-500);
   flex-shrink: 0;
   min-width: 44px;
   text-align: center;
@@ -1367,7 +1419,7 @@ body.menu-open { overflow: hidden; }
   width: 180px; height: 120px;
   border-radius: 12px;
   overflow: hidden;
-  background: var(--gray-100);
+  background-color: var(--gray-100);
 }
 .joq-list__img img {
   width: 100%; height: 100%;
@@ -1406,7 +1458,7 @@ body.menu-open { overflow: hidden; }
   overflow: hidden;
   margin-bottom: 8px;
 }
-.joq-list__meta { font-size: 12px; color: var(--gray-500); }
+.joq-list__meta { font-size: 12px; color: var(--gray-600); }
 
 
 /* ==========================================================================
@@ -1870,7 +1922,7 @@ body.menu-open { overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 0 28px;
+  padding: 24px 0 18px;
 }
 .joq-footer__copy { font-size: 12px; color: rgba(255,255,255,.15); }
 .joq-footer__credit {
@@ -1892,6 +1944,26 @@ body.menu-open { overflow: hidden; }
   color: var(--white);
   border-bottom-color: var(--white);
 }
+
+/* Very bottom of the page, centred under the copyright bar. */
+.joq-footer__powered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 0 26px;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.3);
+}
+.joq-footer__powered-logo {
+  width: auto;
+  height: 18px;
+  display: block;
+  opacity: .75;
+  transition: opacity .25s var(--ease);
+}
+.joq-footer__powered:hover .joq-footer__powered-logo { opacity: 1; }
 
 
 /* ==========================================================================
@@ -2318,7 +2390,7 @@ body.menu-open { overflow: hidden; }
   width: 80px; height: 60px;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--gray-100);
+  background-color: var(--gray-100);
 }
 .joq-post__sidebar-img img {
   width: 100%; height: 100%;
@@ -2345,7 +2417,7 @@ body.menu-open { overflow: hidden; }
 .joq-post__sidebar-article:hover .joq-post__sidebar-title { color: var(--red); }
 .joq-post__sidebar-time {
   font-size: 11px;
-  color: var(--gray-500);
+  color: var(--gray-600);
   margin-top: 4px;
 }
 
@@ -2425,6 +2497,12 @@ body.menu-open { overflow: hidden; }
   border-radius: 12px;
   overflow: hidden;
   background: var(--gray-100);
+}
+/* The thumbnail is normally wrapped in a link; make that wrapper fill the box
+   so the image's height:100% has something to resolve against. */
+.joq-category__article-img > a {
+  display: block;
+  width: 100%; height: 100%;
 }
 .joq-category__article-img img {
   width: 100%; height: 100%;
@@ -2802,6 +2880,12 @@ body.menu-open { overflow: hidden; }
   transform: translateY(-3px);
   box-shadow: 0 10px 28px rgba(227,30,36,.4);
 }
+/* The theme's floating WhatsApp button (newstyle.css: a#whatsapp-button) is
+   fixed at bottom:33px/right:1px on mobile and would sit under this one.
+   Stack above it, as the old button#back-to-top did at bottom:76px. */
+@media (max-width: 768px) {
+  .joq-scroll-top { bottom: 80px; right: 10px; }
+}
 
 
 /* ==========================================================================
@@ -2859,19 +2943,22 @@ body.menu-open { overflow: hidden; }
   .joq-header__burger { display: flex; }
   .joq-header__live { font-size: 10px; padding: 6px 12px 6px 10px; }
   .joq-ticker { height: 36px; }
+  .joq-ticker__inner { padding: 0 16px; gap: 10px; }
   .joq-ticker__badge { font-size: 9px; padding: 3px 8px; }
   .joq-ticker__item { font-size: 12px; }
 
   /* Hero mobile */
   .joq-hero__slide { height: 400px; }
-  .joq-hero__content { bottom: 36px; padding: 0 20px; }
+  .joq-hero__content { bottom: 44px; padding: 0 16px; }
   .joq-hero__title { font-size: 24px; max-width: 100%; }
   .joq-hero__cat { font-size: 10px; padding: 4px 10px; margin-bottom: 12px; }
   .joq-hero__meta { margin-top: 12px; gap: 12px; }
   .joq-hero__read { display: none; }
+  .joq-hero__excerpt { font-size: 14px; -webkit-line-clamp: 2; }
 
-  /* Content mobile */
+  /* Content mobile — every band shares one 16px gutter */
   .joq-main { padding: 0 16px; }
+  .joq-footer__inner { padding: 0 16px; }
   .joq-grid { grid-template-columns: 1fr; gap: 14px; }
   .joq-card { border-radius: 14px; }
   .joq-card__body { padding: 14px 16px 16px; }
@@ -2892,6 +2979,7 @@ body.menu-open { overflow: hidden; }
   .joq-section { margin-top: 40px; }
   .joq-section__title { font-size: 18px; }
   .joq-section__header { margin-bottom: 20px; }
+  /* negative margin must match .joq-main's padding or the band bleeds past the screen */
   .joq-section--accent { padding: 32px 16px; margin-left: -16px; margin-right: -16px; }
 
   /* Kape mobile */
@@ -2952,9 +3040,11 @@ body.menu-open { overflow: hidden; }
     flex-direction: column;
     gap: 14px;
     text-align: center;
-    padding: 20px 0 24px;
+    padding: 20px 0 16px;
   }
   .joq-footer__credit { justify-content: center; }
+  .joq-footer__powered { padding-bottom: 22px; font-size: 11px; }
+  .joq-footer__powered-logo { height: 16px; }
 
   /* Mobile menu */
   .joq-mobile-menu__footer { flex-direction: column; }
@@ -3009,10 +3099,10 @@ body.menu-open { overflow: hidden; }
 @media (max-width: 480px) {
   .joq-hero__slide { height: 320px; }
   .joq-hero__title { font-size: 20px; }
-  .joq-hero__content { bottom: 24px; padding: 0 16px; }
+  .joq-hero__content { bottom: 40px; }
   .joq-featured-grid { grid-template-columns: 1fr; }
   .joq-section__title { font-size: 16px; }
-  .joq-main { padding: 0 14px; }
+  .joq-main { padding: 0 16px; }
   .joq-section__more { font-size: 12px; }
 
   .joq-footer__app-banner-inner { padding: 28px 16px; }
@@ -3089,4 +3179,864 @@ body.menu-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .joq-progress { transition: none; }
   .joq-progress__fill { transition: none; box-shadow: none; }
+}
+
+
+/* ==========================================================================
+   HOMEPAGE V2 — ticker pause, hero excerpt, category tiles, split layout,
+   report CTA, trending strip, header CTA. Mockup-inspired; header stays dark.
+   ========================================================================== */
+
+/* Ticker: pause the marquee while the reader is on it */
+.joq-ticker:hover .joq-ticker__track { animation-play-state: paused; }
+
+/* Hero excerpt — sits between title and meta */
+.joq-hero__excerpt {
+  margin-top: 14px;
+  max-width: 620px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Category tiles */
+.joq-tiles {
+  display: grid;
+  /* 9 tiles: a single row on desktop, 3x3 below. Both divide evenly, so no
+     lone tile is ever orphaned on its own row. */
+  grid-template-columns: repeat(9, 1fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+.joq-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 10px 16px;
+  min-height: 150px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  text-align: center;
+  transition: all .3s var(--ease);
+}
+.joq-tile:hover {
+  border-color: transparent;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+}
+.joq-tile__icon {
+  width: 72px; height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .3s var(--ease-out);
+}
+.joq-tile:hover .joq-tile__icon { transform: scale(1.08); }
+.joq-tile__icon img { width: 100%; height: 100%; object-fit: contain; }
+.joq-tile__icon svg { width: 44px; height: 44px; color: var(--red); }
+.joq-tile__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gray-900);
+  transition: color .2s var(--ease);
+}
+.joq-tile:hover .joq-tile__label { color: var(--red); }
+
+/* Split: featured (left) + latest list (right) */
+.joq-home-split {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  /* stretch, not start: the rail's sticky module needs the full row height to travel */
+  align-items: stretch;
+}
+.joq-section--feed { margin-top: 44px; }
+.joq-home-split__main > .joq-section__header { margin-bottom: 14px; }
+.joq-latest {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.joq-latest .joq-section__header {
+  margin: 0;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.joq-latest .joq-section__title { font-size: 18px; }
+.joq-latest .joq-section__title::before { height: 18px; }
+.joq-latest .joq-post__sidebar-article { padding: 10px 16px; }
+.joq-latest__ad { padding: 10px 18px; border-bottom: 1px solid var(--gray-100); }
+.joq-latest__ad > div { margin: 0 auto; }
+
+/* Report CTA — "Ke një lajm? Na shkruaj!" */
+.joq-report {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 40px;
+  padding: 28px 32px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.joq-report::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: -40px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(227,30,36,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.joq-report__icon {
+  width: 64px; height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 8px 24px rgba(227,30,36,.3);
+  position: relative;
+}
+.joq-report__text { flex: 1; min-width: 0; position: relative; }
+.joq-report__title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+.joq-report__sub { font-size: 13.5px; color: var(--gray-600); line-height: 1.5; }
+.joq-report__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--red);
+  padding: 14px 26px;
+  border-radius: 12px;
+  transition: all .3s var(--ease);
+  white-space: nowrap;
+}
+.joq-report__btn svg { transition: transform .3s var(--ease); }
+.joq-report__btn:hover {
+  background: var(--red-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(227,30,36,.35);
+}
+.joq-report__btn:hover svg { transform: translateX(4px); }
+.joq-report__badges {
+  display: flex;
+  gap: 22px;
+  flex-shrink: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--gray-200);
+}
+.joq-report__badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--gray-700);
+  max-width: 120px;
+}
+.joq-report__badge-icon {
+  width: 34px; height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+/* Trending — numbered horizontal cards */
+.joq-trending {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.joq-trending__item {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all .3s var(--ease);
+}
+.joq-trending__item:hover {
+  border-color: transparent;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.08);
+}
+.joq-trending__top {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px 12px 0;
+}
+.joq-trending__num {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--gray-500);
+  line-height: 1;
+  align-self: flex-start;
+  transition: color .2s var(--ease);
+}
+.joq-trending__item:hover .joq-trending__num { color: var(--red); }
+.joq-trending__img {
+  flex: 1;
+  aspect-ratio: 16/10;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--gray-100);
+}
+.joq-trending__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease-out); }
+.joq-trending__item:hover .joq-trending__img img { transform: scale(1.05); }
+.joq-trending__title {
+  /* bottom spacing is margin, not padding: Chrome paints -webkit-line-clamp
+     overflow into the padding box, which showed a clipped third line */
+  padding: 12px 14px 0;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--gray-900);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .2s var(--ease);
+}
+.joq-trending__item:hover .joq-trending__title { color: var(--red); }
+
+/* Header: "Dërgo denoncim" outlined button */
+.joq-header__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.22);
+  padding: 8px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: all .2s var(--ease);
+}
+.joq-header__cta:hover {
+  color: var(--white);
+  border-color: var(--red);
+  background: rgba(227,30,36,.12);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .joq-tiles { grid-template-columns: repeat(3, 1fr); }
+  .joq-home-split { grid-template-columns: 1fr; }
+  .joq-report { flex-wrap: wrap; }
+  .joq-report__badges { width: 100%; padding-left: 0; border-left: none; padding-top: 18px; border-top: 1px solid var(--gray-200); }
+  .joq-header__cta { display: none; }
+}
+@media (max-width: 768px) {
+  .joq-tiles { gap: 10px; margin-top: 20px; }
+  .joq-tile { padding: 14px 8px 12px; gap: 8px; min-height: 0; }
+  .joq-tile__icon { width: 56px; height: 56px; }
+  .joq-tile__icon svg { width: 34px; height: 34px; }
+  .joq-report { padding: 22px 20px; gap: 16px; }
+  .joq-report__title { font-size: 19px; }
+  .joq-report__btn { width: 100%; justify-content: center; }
+  .joq-report__badges { gap: 14px; }
+  .joq-trending {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    margin: 0 -16px;
+    padding-left: 16px; padding-right: 16px;
+  }
+  .joq-trending__item { flex: 0 0 72%; scroll-snap-align: start; }
+}
+@media (max-width: 480px) {
+  .joq-tiles { grid-template-columns: repeat(3, 1fr); }
+  .joq-report__badges { flex-direction: column; gap: 10px; }
+  .joq-report__badge { max-width: none; }
+}
+
+
+/* ==========================================================================
+   LEGACY OVERRIDE — hover underline
+   newstyle.css sets a global `a:hover { text-decoration: underline }`. The
+   reset at the top of this file only covers `a`, which `a:hover` outranks, so
+   every link in every design-system component picked up an underline on hover.
+   Hover is already expressed here by colour, lift and scale, so switch it off.
+   Article body links keep their underline deliberately — see .joq-post__content.
+   ========================================================================== */
+a[class*="joq-"]:hover,
+[class*="joq-"] a:hover { text-decoration: none; }
+
+.joq-post__content a,
+.joq-post__content a:hover { text-decoration: underline; }
+
+
+/* ==========================================================================
+   HOMEPAGE V3 — accessibility helpers, ticker controls, load-more state,
+   skeletons, compact mobile cards, category rows, hero mosaic responsive.
+   ========================================================================== */
+
+/* Visually hidden (page h1) and the skip link */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.joq-skip {
+  position: absolute;
+  top: -100px; left: 16px;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+  border-radius: 0 0 10px 10px;
+  transition: top .2s var(--ease);
+}
+.joq-skip:focus { top: 0; outline: none; }
+
+/* Keyboard focus — hover is colour/lift only, so focus needs its own cue */
+[class*="joq-"] a:focus-visible,
+a[class*="joq-"]:focus-visible,
+[class*="joq-"] button:focus-visible,
+button[class*="joq-"]:focus-visible,
+[class*="joq-"] input:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* Ticker: pause/play control, duration scaled by item count, reduced motion */
+.joq-ticker__toggle {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.joq-ticker__toggle:hover { color: var(--red); border-color: var(--red); }
+.joq-ticker__toggle svg { width: 12px; height: 12px; }
+.joq-ticker__ico-play { display: none; }
+.joq-ticker--paused .joq-ticker__ico-play { display: block; }
+.joq-ticker--paused .joq-ticker__ico-pause { display: none; }
+.joq-ticker--paused .joq-ticker__track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .joq-ticker__track { animation: none; }
+  .joq-ticker__scroll { overflow-x: auto; }
+  .joq-ticker__toggle { display: none; }
+}
+
+/* Search overlay label is now a real <label> */
+.joq-search__label { display: block; }
+
+/* Split: the left column must be allowed to shrink below its content */
+.joq-home-split__main { min-width: 0; }
+
+/* Load more — under the grid it appends to */
+.joq-load-more { text-align: center; margin-top: 24px; }
+.joq-category__load-btn { font-family: inherit; }
+.joq-category__load-btn:disabled,
+.joq-category__load-btn.is-loading {
+  opacity: .6;
+  cursor: progress;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ad band — a centred row of 300x250 slots under the split */
+.joq-adrow {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 44px;
+}
+.joq-adrow > div { width: 300px; min-height: 250px; }
+.joq-adrow__label {
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin-bottom: -6px;
+}
+/* .pc-only is display:none above 600px in newstyle.css and this file loads after
+   it, so the flex above would win the cascade. Hide it explicitly. */
+@media (max-width: 600px) { .joq-adrow { display: none; } }
+
+/* Progressive feed — one cycle (three stories + a category block) is rendered
+   open and "Më shumë" reveals the next one beneath it, so the page grows
+   downward. Scoped to .joq-js like the reveal animations: if the script never
+   runs every cycle stays visible rather than the page hiding content for good. */
+.joq-cycle + .joq-cycle { margin-top: 30px; }
+.joq-js .joq-cycle:not(.is-active),
+.joq-js .joq-feed__tail:not(.is-active) { display: none; }
+.joq-feed__more { display: none; }
+.joq-js .joq-feed__more {
+  display: block;
+  text-align: center;
+  margin-top: 30px;
+}
+.joq-feed__more[hidden] { display: none; }
+
+/* Ad slots — DFP books a slot but the creative it returns can be wider (a 336px
+   banner in a 300px slot). Clamp it to the slot instead of letting one ad push
+   the page sideways; anything still oversize is clipped evenly, not dragged. */
+.adunit-1 { max-width: 100%; }
+.adunit-1 iframe,
+.adunit-1 img { max-width: 100%; }
+.joq-feed-ad,
+.joq-latest__ad,
+.joq-adrow > div { max-width: 100%; overflow: hidden; }
+
+/* Feed ad — a mobile-only slot between category blocks */
+.joq-feed-ad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 26px 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+}
+.joq-feed-ad__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+}
+.joq-feed-ad > .adunit-1 { width: 300px; max-width: 100%; min-height: 100px; }
+/* newstyle.css hides .mobile-only above 600px, but this file loads after it, so
+   the flex above would win the cascade. Hide it explicitly. */
+@media (min-width: 601px) { .joq-feed-ad { display: none; } }
+
+/* Rail — "Të fundit" plus a sticky ad that trails the growing feed */
+.joq-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+.joq-rail__sticky {
+  position: sticky;
+  top: 80px;               /* clears the 64px sticky nav */
+  display: flex;
+  justify-content: center;
+}
+.joq-rail__sticky > div { width: 300px; min-height: 250px; max-width: 100%; overflow: hidden; }
+/* one column below 1024px, so there is nothing to stick beside */
+@media (max-width: 1024px) {
+  .joq-rail__sticky { position: static; }
+}
+
+/* Most read — skeleton cards hold the layout until the AJAX fragment lands */
+.joq-trending[aria-busy="true"] { min-height: 190px; }
+.joq-trending__item.is-skeleton { pointer-events: none; }
+.joq-trending__item.is-skeleton .joq-trending__img,
+.joq-trending__item.is-skeleton .joq-trending__title span {
+  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+  background-size: 200% 100%;
+  animation: joqShimmer 1.4s linear infinite;
+}
+.joq-trending__item.is-skeleton .joq-trending__title span {
+  display: block;
+  height: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.joq-trending__item.is-skeleton .joq-trending__title span:last-child { width: 70%; margin-bottom: 0; }
+@keyframes joqShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joq-trending__item.is-skeleton .joq-trending__img,
+  .joq-trending__item.is-skeleton .joq-trending__title span { animation: none; }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .joq-trending { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+
+}
+
+
+/* ==========================================================================
+   STORY ROWS — the main feed: title + description on the left, the story's
+   own image on the right, hairline between rows.
+   ========================================================================== */
+.joq-stories { border-top: 1px solid var(--gray-200); }
+.joq-stories:empty { border-top: 0; }
+.joq-catblock + .joq-stories { margin-top: 30px; }
+.joq-story { border-bottom: 1px solid var(--gray-200); }
+.joq-story > a {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 16px 0;
+  transition: padding-left .2s var(--ease);
+}
+.joq-story:hover > a { padding-left: 4px; }
+.joq-story__body { flex: 1; min-width: 0; }
+.joq-story__kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+/* The icon is one em square, so it matches the label it sits next to whatever
+   the kicker's font-size is. flex-shrink guards it against a long label. */
+.joq-story__kicker-icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: block;
+}
+.joq-story__title {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -.015em;
+  color: var(--gray-900);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .2s var(--ease);
+}
+.joq-story:hover .joq-story__title { color: var(--red); }
+.joq-story__excerpt {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gray-600);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.joq-story__meta {
+  margin-top: 9px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+}
+.joq-story__media {
+  flex-shrink: 0;
+  width: 200px;
+  aspect-ratio: 3 / 2;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--gray-100);
+}
+.joq-story__media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s var(--ease-out);
+}
+.joq-story:hover .joq-story__media img { transform: scale(1.05); }
+
+
+/* ==========================================================================
+   CATEGORY BLOCK — one lead story (title, description, then its image) on the
+   right, three more headlines from the same category on the left.
+   ========================================================================== */
+.joq-catblock {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid var(--gray-900);
+}
+.joq-catblock .joq-section__header { margin-bottom: 16px; }
+.joq-catblock__inner {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 24px;
+  align-items: start;
+}
+/* Lead comes first in the DOM (it is the top story) and is placed right */
+.joq-catblock__lead { grid-column: 2; grid-row: 1; display: block; }
+/* The list stretches to the lead's height and shares it out between the three
+   headlines: first flush with the lead title, last flush with its meta line. */
+.joq-catblock__list {
+  grid-column: 1; grid-row: 1;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+
+.joq-catblock__lead-title {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -.015em;
+  color: var(--gray-900);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .2s var(--ease);
+}
+.joq-catblock__lead:hover .joq-catblock__lead-title { color: var(--red); }
+.joq-catblock__lead-excerpt {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--gray-600);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.joq-catblock__lead-media {
+  margin-top: 12px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--gray-100);
+}
+.joq-catblock__lead-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .6s var(--ease-out);
+}
+.joq-catblock__lead:hover .joq-catblock__lead-media img { transform: scale(1.04); }
+.joq-catblock__meta {
+  margin-top: 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+}
+
+.joq-catblock__item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+.joq-catblock__item:first-child { padding-top: 0; justify-content: flex-start; }
+.joq-catblock__item:last-child { border-bottom: none; padding-bottom: 0; justify-content: flex-end; }
+.joq-catblock__item-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.32;
+  color: var(--gray-900);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .2s var(--ease);
+}
+.joq-catblock__item:hover .joq-catblock__item-title { color: var(--red); }
+.joq-catblock__item .joq-catblock__meta { margin-top: 7px; }
+
+
+/* Story rows + category blocks: responsive */
+@media (max-width: 1024px) {
+  .joq-story__media { width: 190px; }
+}
+@media (max-width: 768px) {
+  .joq-story > a { gap: 16px; padding: 18px 0; }
+  .joq-story__title { font-size: 17px; -webkit-line-clamp: 3; }
+  .joq-story__excerpt { font-size: 13.5px; -webkit-line-clamp: 2; margin-top: 7px; }
+  .joq-story__meta { margin-top: 8px; font-size: 10px; }
+  .joq-story__media { width: 130px; border-radius: 8px; }
+
+  .joq-catblock { margin-top: 28px; }
+  /* one column: the lead (image and all) comes first, then the three headlines */
+  .joq-catblock__inner { grid-template-columns: 1fr; gap: 20px; }
+  .joq-catblock__lead,
+  .joq-catblock__list { grid-column: auto; grid-row: auto; }
+  .joq-catblock__lead-title { font-size: 18px; }
+  .joq-catblock__lead-excerpt { font-size: 13.5px; }
+  .joq-catblock__item-title { font-size: 15px; }
+}
+@media (max-width: 480px) {
+  .joq-story > a { gap: 12px; padding: 16px 0; }
+  .joq-story__title { font-size: 16px; }
+  .joq-story__excerpt { display: none; }
+  .joq-story__media { width: 108px; }
+}
+
+
+
+/* ==========================================================================
+   404
+   ========================================================================== */
+.joq-404 {
+  text-align: center;
+  padding: 72px 0 56px;
+}
+.joq-404__code {
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--red);
+  letter-spacing: -.03em;
+}
+.joq-404__title {
+  margin-top: 14px;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+.joq-404__text {
+  margin: 12px auto 0;
+  max-width: 44ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray-600);
+}
+.joq-404__actions { margin-top: 26px; }
+.joq-404__btn {
+  display: inline-block;
+  padding: 13px 26px;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  transition: all .25s var(--ease);
+}
+.joq-404__btn:hover { background: var(--gray-900); color: var(--white); }
+.joq-404__cats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 34px;
+}
+.joq-404__cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-900);
+  transition: all .25s var(--ease);
+}
+.joq-404__cat:hover { border-color: var(--red); color: var(--red); }
+/* One em square, same rule as the kickers and the section headings. */
+.joq-404__cat-icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .joq-404 { padding: 48px 0 36px; }
+  .joq-404__code { font-size: 68px; }
+  .joq-404__title { font-size: 22px; }
+  .joq-404__text { font-size: 14px; }
+}
+
+/* ==========================================================================
+   FALLBACK MARK
+   The JOQ logo sits behind every picture box and ad slot. An image that loads
+   paints over it; one that is missing, still downloading or broken leaves it
+   showing, so a box is never blank or stuck with the browser's broken glyph.
+   ========================================================================== */
+.joq-story__media,
+.joq-catblock__lead-media,
+.joq-post__sidebar-img,
+.joq-list__img,
+.joq-trending__img,
+.joq-card__img,
+.joq-featured-card__img,
+.adunit-1 {
+  background-color: var(--gray-100);
+  background-image: var(--joq-fallback);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 62% auto;
+}
+/* The two legacy side rails are absolutely positioned over the page margins and
+   across the feed, so an empty one must stay invisible the way it always was
+   rather than park a grey panel beside the stories. */
+.fixed-left-banner .adunit-1,
+.fixed-right-banner .adunit-1 {
+  background-color: transparent;
+  background-image: none;
+}
+
+/* Small boxes: the mark needs proportionally more room to stay legible. */
+.joq-post__sidebar-img,
+.joq-trending__img { background-size: 78% auto; }
+
+/* A broken <img> has its content replaced by the mark. Replacing it rather than
+   painting behind it is what removes the browser's broken-image glyph, and it
+   also covers pictures outside the wrappers above (house banners, creatives). */
+img.is-broken {
+  content: var(--joq-fallback);
+  object-fit: contain;
+  background-color: var(--gray-100);
+  color: transparent;   /* hides alt text in browsers that ignore content */
+}
+/* The hero slide takes its picture from an inline background-image; when that is
+   empty the declaration is invalid and dropped, so these show through instead. */
+.joq-hero__slide {
+  background-color: var(--gray-200);
+  background-image: var(--joq-fallback);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40% auto;
 }
