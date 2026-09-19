@@ -52,15 +52,18 @@ if ( $joq_hero_q->have_posts() ) {
     <meta name="google-site-verification" content="kQ4bP_ZT5Z7QD2vAAheHvCVWxbFH7fRNIB55Ld-rAS8" />
     <meta property="fb:app_id" content="1591048791052134" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="sq_AL" />
-    <meta name="description" content="Krijuar më 5 shkurt 2010, joq-albania.com është platforma më e madhe e lajmeve unike, argëtuese dhe sociale në hapësirën shqipfolëse. Nga vijnë materialet? Nga ju dhe komuniteti. Përveç kësaj, ne lundrojmë kudo ku ka shqiptarë dhe ju sjellim nga andej më të mirën duke argëtuar qindra mijëra vizitorë në ditë." />
+    <?php $joq_home_desc = 'Krijuar më 5 shkurt 2010, joq-albania.com është platforma më e madhe e lajmeve unike, argëtuese dhe sociale në hapësirën shqipfolëse. Nga vijnë materialet? Nga ju dhe komuniteti. Përveç kësaj, ne lundrojmë kudo ku ka shqiptarë dhe ju sjellim nga andej më të mirën duke argëtuar qindra mijëra vizitorë në ditë.'; ?>
+    <meta name="description" content="<?php echo esc_attr( $joq_home_desc ); ?>" />
     <link rel="canonical" href="https://joq-albania.com/" />
     <meta name="author" content="JOQ" />
-    <meta property="og:url" content="https://joq-albania.com/">
-    <meta property="og:title" content="JOQ Albania" />
-    <meta property="og:description" content="Krijuar më 5 shkurt 2010, joq-albania.com është platforma më e madhe e lajmeve unike, argëtuese dhe sociale në hapësirën shqipfolëse. Nga vijnë materialet? Nga ju dhe komuniteti. Përveç kësaj, ne lundrojmë kudo ku ka shqiptarë dhe ju sjellim nga andej më të mirën duke argëtuar qindra mijëra vizitorë në ditë." />
-    <meta property="og:image" content="https://static.joq-albania.com/assets/images/joq-final2.png" />
+    <?php /* og:image was joq-final2.png at 326x182 -- under Facebook's 600x315
+       minimum for a large card, so the homepage shared as a small thumbnail.
+       The shared card is 1200x630. */ ?>
+    <?php echo joq_social_meta( array(
+        'title'       => 'JOQ Albania',
+        'description' => $joq_home_desc,
+        'url'         => 'https://joq-albania.com/',
+    ) ); ?>
     <title>JOQ Albania</title>
 
   <link rel="shortcut icon" href="https://static.joq-albania.com/assets/images/facivon4.ico" type="image/x-icon">

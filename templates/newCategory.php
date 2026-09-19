@@ -36,8 +36,7 @@
     <meta name="google-site-verification" content="kQ4bP_ZT5Z7QD2vAAheHvCVWxbFH7fRNIB55Ld-rAS8" />
     <meta property="fb:app_id" content="1591048791052134" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="sq_AL" />
+
     <?php 
         $thiscat = $wp_query->get_queried_object();
         $categoryName = $thiscat->name;
@@ -46,9 +45,14 @@
     <meta name="description" content="JOQ Lajme nga kategoria <?php echo $categoryName ?>" />
     <link rel="canonical" href="https://joq-albania.com/kategori/<?php echo $categorySlug ?>.html" />
     <meta name="author" content="JOQ" />
-    <meta property="og:title" content="JOQ -  <?php echo $categoryName ?> " />
-    <meta property="og:description" content="JOQ Lajme nga kategoria <?php echo $categoryName ?>" />
-    <meta property="og:image" content="https://static.joq-albania.com/assets/images/logoJOQ.jpg" />
+    <?php /* og:image was logoJOQ.jpg at 208x142 -- below Facebook's 600x315
+       minimum for a large card, so category links shared as a thumbnail or not
+       at all. The shared card is 1200x630. */ ?>
+    <?php echo joq_social_meta( array(
+        'title'       => 'JOQ - ' . $categoryName,
+        'description' => 'JOQ Lajme nga kategoria ' . $categoryName,
+        'url'         => 'https://joq-albania.com/kategori/' . $categorySlug . '.html',
+    ) ); ?>
     <title>JOQ - <?php echo $categoryName ?></title>
 
     <link rel="shortcut icon" href="https://static.joq-albania.com/assets/images/facivon4.ico" type="image/x-icon">

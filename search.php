@@ -19,6 +19,20 @@ $joq_term      = get_search_query();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, follow" />
     <title><?php echo $joq_term ? 'K&euml;rkim: ' . esc_html( $joq_term ) : 'K&euml;rko'; ?> &mdash; JOQ Albania</title>
+    <?php
+      $joq_search_title = $joq_term
+          ? 'Rezultate për "' . $joq_term . '" - JOQ Albania'
+          : 'Kërko lajme - JOQ Albania';
+      $joq_search_desc  = $joq_term
+          ? 'Lajmet që përmbajnë "' . $joq_term . '" në JOQ Albania.'
+          : 'Kërko mes lajmeve më të fundit në JOQ Albania.';
+    ?>
+    <meta name="description" content="<?php echo esc_attr( $joq_search_desc ); ?>" />
+    <?php echo joq_social_meta( array(
+        'title'       => $joq_search_title,
+        'description' => $joq_search_desc,
+        'url'         => 'https://joq-albania.com/kerko.html',
+    ) ); ?>
 
     <link rel="icon" href="<?php echo $joq_theme_uri; ?>/assets/images/icons/icon.png" />
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />

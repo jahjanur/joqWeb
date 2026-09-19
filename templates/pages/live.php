@@ -25,10 +25,12 @@ if ( $joq_cache ) {
     <title>Transmetim direkt &mdash; JOQ Albania</title>
     <meta name="description" content="Shiko TVA News direkt n&euml; JOQ Albania." />
     <link rel="canonical" href="https://joq-albania.com/faqe/live.html" />
-    <meta property="og:type" content="video.other" />
-    <meta property="og:locale" content="sq_AL" />
-    <meta property="og:title" content="Transmetim direkt - JOQ Albania" />
-    <meta property="og:url" content="https://joq-albania.com/faqe/live.html" />
+    <?php echo joq_social_meta( array(
+        'title'       => 'Transmetim direkt - JOQ Albania',
+        'description' => 'Shiko TVA News direkt në JOQ Albania.',
+        'url'         => 'https://joq-albania.com/faqe/live.html',
+        'type'        => 'video.other',
+    ) ); ?>
 
     <link rel="icon" href="<?php echo $joq_theme_uri; ?>/assets/images/icons/icon.png" />
     <link rel="preconnect" href="https://live.tvanews.com" />

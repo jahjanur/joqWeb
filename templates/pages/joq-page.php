@@ -51,10 +51,11 @@ $joq_theme_uri = '/wp-content/themes/joq';
     <title><?php echo wp_strip_all_tags( $joq_title ); ?> &mdash; JOQ Albania</title>
     <meta name="description" content="<?php echo esc_attr( wp_strip_all_tags( $joq_sub ) ); ?>" />
     <link rel="canonical" href="https://joq-albania.com/faqe/<?php echo $joq_slug; ?>.html" />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="sq_AL" />
-    <meta property="og:title" content="<?php echo esc_attr( wp_strip_all_tags( $joq_title ) ); ?> - JOQ Albania" />
-    <meta property="og:url" content="https://joq-albania.com/faqe/<?php echo $joq_slug; ?>.html" />
+    <?php echo joq_social_meta( array(
+        'title'       => wp_strip_all_tags( $joq_title ) . ' - JOQ Albania',
+        'description' => wp_strip_all_tags( $joq_sub ),
+        'url'         => 'https://joq-albania.com/faqe/' . $joq_slug . '.html',
+    ) ); ?>
 
     <link rel="icon" href="<?php echo $joq_theme_uri; ?>/assets/images/icons/icon.png" />
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />

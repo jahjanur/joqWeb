@@ -802,3 +802,64 @@ function joq_page_template( $template ) {
     $dispatcher = get_template_directory() . '/templates/pages/joq-page.php';
     return file_exists( $dispatcher ) ? $dispatcher : $template;
 }
+
+/** Default share card for pages with no picture of their own: 1200x630, the
+ *  size Facebook and WhatsApp want for a large card. Swap the file at this path
+ *  for a designed one and every page picks it up. */
+if ( ! defined( 'JOQ_SHARE_IMAGE' ) ) {
+    define( 'JOQ_SHARE_IMAGE', 'https://joq-albania.com/wp-content/themes/joq/assets/images/joq-share-1200x630.png' );
+}
+
+/**
+ * Emit the Open Graph and Twitter block for a page.
+ *
+ * Every template was spelling these twelve tags out by hand, which is how the
+ * static pages, the Live page and the search page ended up with no og:image at
+ * all -- a link shared to Facebook or WhatsApp showed a preview card with no
+ * picture. One helper, one place to fix.
+ *
+ * $args: title, description, url, image (absolute URL), type, twitter_card.
+ */
+function joq_social_meta( $args = array() ) {
+    $a = wp_parse_args( $args, array(
+        'title'        => get_bloginfo( 'name' ),
+        'description'  => '',
+        'url'          => '',
+        'image'        => JOQ_SHARE_IMAGE,
+        'type'         => 'website',
+        'twitter_card' => 'summary_large_image',
+    ) );
+
+    /* A page that falls back to the share card must not claim a photo's
+       dimensions, and one with a real picture rarely knows them, so width and
+       height are only asserted for the card itself. */
+    $is_default = ( $a['image'] === JOQ_SHARE_IMAGE );
+
+    $out  = '<meta property="og:type" content="' . esc_attr( $a['type'] ) . '" />' . "\n";
+    $out .= '    <meta property="og:locale" content="sq_AL" />' . "\n";
+    $out .= '    <meta property="og:site_name" content="JOQ Albania" />' . "\n";
+    $out .= '    <meta property="og:title" content="' . esc_attr( $a['title'] ) . '" />' . "\n";
+    if ( $a['description'] ) {
+        $out .= '    <meta property="og:description" content="' . esc_attr( $a['description'] ) . '" />' . "\n";
+    }
+    if ( $a['url'] ) {
+        $out .= '    <meta property="og:url" content="' . esc_url( $a['url'] ) . '" />' . "\n";
+    }
+    if ( $a['image'] ) {
+        $out .= '    <meta property="og:image" content="' . esc_url( $a['image'] ) . '" />' . "\n";
+        if ( $is_default ) {
+            $out .= '    <meta property="og:image:width" content="1200" />' . "\n";
+            $out .= '    <meta property="og:image:height" content="630" />' . "\n";
+        }
+    }
+    $out .= '    <meta name="twitter:card" content="' . esc_attr( $a['twitter_card'] ) . '" />' . "\n";
+    $out .= '    <meta name="twitter:site" content="@JoqAlbania" />' . "\n";
+    $out .= '    <meta name="twitter:title" content="' . esc_attr( $a['title'] ) . '" />' . "\n";
+    if ( $a['description'] ) {
+        $out .= '    <meta name="twitter:description" content="' . esc_attr( $a['description'] ) . '" />' . "\n";
+    }
+    if ( $a['image'] ) {
+        $out .= '    <meta name="twitter:image" content="' . esc_url( $a['image'] ) . '" />' . "\n";
+    }
+    return $out;
+}
