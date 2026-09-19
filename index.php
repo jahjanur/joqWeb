@@ -82,7 +82,7 @@ if ( $joq_hero_q->have_posts() ) {
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.6" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.7" type="text/css" />
 
     <script src="https://static.joq-albania.com/assets/js/jquery.min.js" type="text/javascript"></script>
   <script async src="https://static.joq-albania.com/assets/js/jquery.dfp.min.js" type="text/javascript"></script>

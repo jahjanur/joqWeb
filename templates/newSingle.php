@@ -67,7 +67,7 @@
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v1.02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.6" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.7" type="text/css" />
     
     <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
     <script>
@@ -360,27 +360,37 @@
 		                        </a>
 		                    </div> -->
 
-		                    <?php $relatedNews =  get_field('te_lidhura');  if( $relatedNews ): ?>
+		                    <?php
+		                      /* The query runs before the markup now: the editor's ACF list can
+		                         point at posts that were since unpublished or deleted, and the
+		                         heading used to render over an empty grid in that case.
+		                         'type' was also a no-op -- get_posts() wants 'post_type', so
+		                         attachments could slip in. */
+		                      $related = array();
+		                      $posts   = array();
+		                      $relatedNews = get_field('te_lidhura');
+		                      if ( $relatedNews ) {
+		                          foreach ( $relatedNews as $value ) {
+		                              $related[] = $value['id'];
+		                          }
+		                          if ( $related ) {
+		                              $posts = get_posts( array(
+		                                  'post_type'           => 'post',
+		                                  'post_status'         => 'publish',
+		                                  'post__in'            => $related,
+		                                  'numberposts'         => count( $related ),
+		                                  'ignore_sticky_posts' => true,
+		                              ) );
+		                          }
+		                      }
+		                    ?>
+		                    <?php if ( $posts ) : ?>
 
 		                    <div class="joq-post__related">
-		                    	<?php 
-			                    	$related = array();
-			                    	foreach ($relatedNews as $value) {
-									    array_push($related, $value['id']);
-									}
-		                    	?>
 				    			<h2 class="joq-post__related-title">T&euml; lidhura me lajmin</h2>
 
 				    			<div class="joq-post__related-grid">
-				    			<?php	
-
-				    				$args = array(
-				    					'type' => 'post',
-                						'post_status' => 'publish',
-									    'post__in' => $related
-									);
-
-									$posts = get_posts($args);
+				    			<?php
 
 									
 									foreach ($posts as $p):?>
@@ -411,7 +421,7 @@
 		    				<div class="joq-post__factcheck">
 		    					<strong>FACT CHECK:</strong> 
 		    					Synimi i JOQ Albania është t’i paraqesë lajmet në mënyrë të saktë dhe të drejtë. Nëse ju shikoni diçka që nuk shkon, jeni të lutur të na e
-		    					<a href="mailto:info@joqalbania.com?subject=Fact Check - <?php echo $title; ?>&body=————————————————————————%0AReferring%20URL%3A%20https%3A%2F%2Fjoq-albania.com/artikull/<?php echo $ID ?>.html%0A————————————————————————%0A">raportoni këtu</a>.
+		    					<a href="mailto:info@joqalbania.com?subject=Fact%20Check%20-%20<?php echo rawurlencode( wp_strip_all_tags( $title ) ); ?>&body=————————————————————————%0AReferring%20URL%3A%20https%3A%2F%2Fjoq-albania.com/artikull/<?php echo $ID ?>.html%0A————————————————————————%0A">raportoni këtu</a>.
 		    				</div>
 
 		    				<?php $postTags = get_the_tags(); if ( $postTags ) : ?>
@@ -423,7 +433,11 @@
 		    				<?php endif; ?>
 
 					        <!-- JOQ POLL -->
-	                      	<div class="joq-poll-wrapper article-wrapper" style="margin: 0 auto 5px;">
+	                      	<?php /* hidden until a fragment actually delivers a poll: the shell is
+	                      	     baked into the cached HTML, so an unstyled "JOQ Sondazh" heading
+	                      	     used to sit on the page whenever the poll was off or the
+	                      	     fragment 404'd, right on top of the FACT CHECK box. */ ?>
+	                      	<div class="joq-poll-wrapper article-wrapper" hidden>
 
   								<script src="https://static.joq-albania.com/assets/js/joq-poll3.js?v12.39" type="text/javascript"></script>
 	                      		<script src="https://www.google.com/recaptcha/api.js?render=6LfVhcgUAAAAAJYIeY9PTaOd2nLrAqyArP-5_DUN"></script>
@@ -436,6 +450,17 @@
 	                              	<i class="fa fa-angle-down"></i>
 	                              </div>
 	                            </div>
+					            <script type="text/javascript">
+					              /* Show the wrapper only once one of the two fragments has put a
+					                 real poll inside it. Both callbacks call this; whichever lands
+					                 last wins, and if neither lands the wrapper stays hidden. */
+					              function joqPollReveal() {
+					                var w = document.querySelector('.joq-poll-wrapper');
+					                if (!w) { return; }
+					                var filled = w.querySelector('.jp .joq-poll-body, .jp2 .joq-poll-body, .jp ul, .jp2 ul');
+					                if (filled) { w.hidden = false; }
+					              }
+					            </script>
 					            <div class="joq-poll-body">
 					                <div class="jp"></div>
 						            <script type="text/javascript">
@@ -446,6 +471,7 @@
 												$( ".jp" ).remove();
 						                  	}
 						                  } catch(err) {console.log(err)};
+						                  joqPollReveal();
 						                });
 						            </script>
 						            <div class="jp2"></div>
@@ -462,6 +488,7 @@
 								                  		}
 								                  	}
 								                } catch(err) {console.log(err)};
+								                joqPollReveal();
 								            }, 50);
 						                });
 						            </script>
@@ -549,27 +576,51 @@
 		    		</div>
 
 
+		    		<?php
+		    		  /* Was a $.get for /myAjax/more-from-{slug}.html. That fragment is
+		    		     generated by pages/menu-dropdown.php, which guards on ctype_alpha(),
+		    		     so it never exists for a hyphenated slug -- vec-e-jona,
+		    		     persekutimi-ndaj-joq, hallet-e-popullit, si-te. Those articles
+		    		     always showed the heading above an empty white card. Rendered here
+		    		     instead: same category, never empty, and nothing at all when the
+		    		     category has no other published post. */
+		    		  $joqCats    = get_the_category( $post->ID );
+		    		  $joqCatSlug = ! empty( $joqCats ) ? $joqCats[0]->slug : '';
+		    		  $joqSameCat = array();
+		    		  if ( $joqCatSlug && $joqCatSlug !== 'slide-kryesor-1' ) {
+		    		      $joqSameCat = get_posts( array(
+		    		          'post_type'           => 'post',
+		    		          'post_status'         => 'publish',
+		    		          'category'            => $joqCats[0]->term_id,
+		    		          'numberposts'         => 3,
+		    		          'post__not_in'        => array_merge( array( $post->ID ), ( isset( $related ) && is_array( $related ) ) ? $related : array() ),
+		    		          'ignore_sticky_posts' => true,
+		    		      ) );
+		    		  }
+		    		?>
+		    		<?php if ( $joqSameCat ) : ?>
 		    		<div class="news-related-news">
-		    			<?php $postCat = get_the_category($post->ID)[0]->slug;?>
 		    			<div class="block-title" style="text-align: left;">
-		    				<!-- T&euml; tjera nga <?php echo $postCat; ?>... -->
 		    				T&Euml; NGJASHME
 		    			</div>
 
-		    			<div class="related-news-article-wrapper"></div>
-		    			<script type="text/javascript">
-
-		    				if ('<?php echo $postCat ?>' === 'slide-kryesor-1') {
-		    					$('.news-related-news').remove();
-		    				} else {
-		    					$.get( "/myAjax/more-from-<?php echo $postCat ?>.html", function( data ) {
-	                              $( ".related-news-article-wrapper" ).html( data );
-	                            });
-		    				}
-                            
-                        </script>
+		    			<div class="related-news-article-wrapper">
+		    				<?php foreach ( $joqSameCat as $joqRel ) : ?>
+		    				<div class="article-wrapper" style="width: 33.3333%">
+		    					<a href="<?php echo get_permalink( $joqRel->ID ); ?>">
+		    						<div class="article-image">
+		    							<?php echo joq_thumb_img( $joqRel->ID, 'img2', array( 'alt' => get_the_title( $joqRel->ID ), 'width' => false, 'height' => false ) ); ?>
+		    						</div>
+		    						<div class="article-title">
+		    							<div class="article-title-wrapper"><?php echo get_the_title( $joqRel->ID ); ?></div>
+		    						</div>
+		    					</a>
+		    				</div>
+		    				<?php endforeach; ?>
+		    			</div>
 
 		    		</div>
+		    		<?php endif; ?>
 
     				<div class="mobile-only" style="text-align: center; height:auto; margin:0 auto 5px;">
                         <div class="adunit-1" data-adunit="joq__MOB-300x250-first" data-dimensions="300x250"></div>

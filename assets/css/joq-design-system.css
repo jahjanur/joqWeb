@@ -3980,6 +3980,45 @@ button[class*="joq-"]:focus-visible,
   .joq-404__text { font-size: 14px; }
 }
 
+
+/* ==========================================================================
+   ARTICLE POLL (JOQ Sondazh)
+   The poll's own stylesheet is echoed by the AJAX fragment (pages/poll.php),
+   so until that lands the block has no styling of its own. These rules give
+   the shell the same card treatment as the rest of the article and keep it
+   off the FACT CHECK box below it.
+   ========================================================================== */
+.joq-post__content .joq-poll-wrapper {
+  margin: 32px 0;
+  padding: 0;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.joq-post__content .joq-poll-wrapper[hidden] { display: none; }
+.joq-post__content .joq-poll-title {
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gray-900);
+  cursor: pointer;
+}
+.joq-post__content .joq-poll-title > div {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-top: 4px;
+}
+.joq-post__content .joq-poll-title i { transition: transform .25s var(--ease); }
+.joq-post__content .joq-poll-title i.open { transform: rotate(180deg); }
+.joq-post__content .joq-poll-body > *:not(:empty) { padding: 0 20px 20px; }
+
+/* FACT CHECK keeps its distance from whatever precedes it. */
+.joq-post__factcheck { margin-bottom: 32px; }
+
 /* ==========================================================================
    FALLBACK MARK
    The JOQ logo sits behind every picture box and ad slot. An image that loads
