@@ -195,8 +195,7 @@
 	                    
 	                    <div class="joq-category__article-img">
 	                        <a href="<?php echo get_permalink(); ?>">
-	                            <img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>"
-	                                 alt="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" />
+	                            <?php echo joq_thumb_img( get_the_ID(), 'img2', array( 'alt' => get_the_title(), 'width' => false, 'height' => false ) ); ?>
 	                        </a>
 	                    </div>
 	                    <div class="joq-category__article-body">
@@ -208,7 +207,7 @@
 	                                <?php $text = wp_strip_all_tags(get_the_content()); echo wp_trim_words( $text, 40, '...' ); ?>
 	                            </div>
 	                            <div class="joq-category__article-meta">
-	                                Shkruar nga: <?php echo get_the_author_meta('first_name') ?> <?php echo get_the_author_meta('last_name') ?> | Publikuar më: <?php echo  get_the_date( 'd.m.Y, H:i' );?>
+	                                <?php $catAuthor = joq_author_line(); if ( $catAuthor ) : ?>Shkruar nga: <?php echo esc_html( $catAuthor ); ?> | <?php endif; ?>Publikuar m&euml;: <?php echo  get_the_date( 'd.m.Y, H:i' );?>
 	                            </div>
 	                        </a>
 	                    </div>
@@ -436,7 +435,7 @@
                                 <?php echo get_the_title( $joq_lp->ID ); ?>
                             </div>
                             <div class="home-category-post-author">
-                                Shkruar nga: <?php echo get_the_author_meta( 'first_name', $joq_lp->post_author ); ?> <?php echo get_the_author_meta( 'last_name', $joq_lp->post_author ); ?> | Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i', $joq_lp->ID ); ?>
+                                <?php $lpAuthor = joq_author_line( $joq_lp ); if ( $lpAuthor ) : ?>Shkruar nga: <?php echo esc_html( $lpAuthor ); ?> | <?php endif; ?>Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i', $joq_lp->ID ); ?>
                             </div>
                         </a>
                     </div>

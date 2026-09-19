@@ -102,7 +102,7 @@ foreach ($posts as $p) :
 ?>
 
 <div class="article-sys4">
-<div class="photo-article-sys4"><a href="<?php echo get_permalink( $p->ID ); ?>"><img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'img2' )) ?>"></a></div>
+<div class="photo-article-sys4"><a href="<?php echo get_permalink( $p->ID ); ?>"><?php echo joq_thumb_img( $p->ID, 'img2', array( 'alt' => get_the_title( $p->ID ), 'width' => false, 'height' => false, 'loading' => false ) ); ?></a></div>
 <div class="box-text-article-sys4">
 <span class="video-sys4"></span>
 <div class="article-text-sys4 homemidFix2"><a href="<?php echo get_permalink( $p->ID ); ?>"><?php echo $p->post_title ?></a></div>
@@ -181,8 +181,7 @@ foreach ($posts as $p) :
         <div class="joq-trending__top">
             <span class="joq-trending__num"><?php echo str_pad( $rank, 2, '0', STR_PAD_LEFT ); ?></span>
             <div class="joq-trending__img">
-                <img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'img2' )) ?>"
-                     alt="<?php echo esc_attr( $p->post_title ); ?>" loading="lazy" />
+                <?php echo joq_thumb_img( $p->ID, 'img2', array( 'alt' => $p->post_title, 'width' => false, 'height' => false ) ); ?>
             </div>
         </div>
         <div class="joq-trending__title"><?php echo $p->post_title ?></div>

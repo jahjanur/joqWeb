@@ -535,6 +535,14 @@ if ( $joq_hero_q->have_posts() ) {
                   echo wp_json_encode( $joq_icon_map );
                 ?>;
 
+                /* An endpoint that hands back a story with no picture must not
+                   produce <img src="">: that re-requests the page and paints the
+                   browser's broken glyph. No src, no img -- the wrapper's
+                   fallback mark shows through instead. */
+                function thumb(url) {
+                  return url ? '<img src="' + url + '" alt="" width="527" height="375" loading="lazy" decoding="async">' : '';
+                }
+
                 /* Every permalink already on the page, so a story the endpoint
                    hands back a second time is skipped instead of repeated. */
                 var seen = {};
@@ -582,7 +590,7 @@ if ( $joq_hero_q->have_posts() ) {
                               '<h3 class="joq-story__title">' + article.title + '</h3>' + excerpt +
                               '<div class="joq-story__meta">' + meta + '</div>' +
                             '</div>' +
-                            '<div class="joq-story__media"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                            '<div class="joq-story__media">' + thumb(article.image) + '</div>' +
                           '</a></article>');
                       });
 
@@ -593,7 +601,7 @@ if ( $joq_hero_q->have_posts() ) {
                           '<a href="' + article.link + '">' +
                             '<div class="joq-trending__top">' +
                               '<span class="joq-trending__num">' + String(n).padStart(2, '0') + '</span>' +
-                              '<div class="joq-trending__img"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                              '<div class="joq-trending__img">' + thumb(article.image) + '</div>' +
                             '</div>' +
                             '<div class="joq-trending__title">' + article.title + '</div>' +
                           '</a></article>');
@@ -601,7 +609,7 @@ if ( $joq_hero_q->have_posts() ) {
 
                       (items.last || []).forEach(function (article) {
                         $('#joq-last-list').append('<a class="joq-post__sidebar-article" href="' + article.link + '">' +
-                          '<div class="joq-post__sidebar-img"><img src="' + article.image + '" alt="" width="527" height="375" loading="lazy" decoding="async"></div>' +
+                          '<div class="joq-post__sidebar-img">' + thumb(article.image) + '</div>' +
                           '<div class="joq-post__sidebar-body">' +
                             '<div class="joq-post__sidebar-title">' + article.title + '</div>' +
                             '<div class="joq-post__sidebar-time">' + (article.time_ago || article.cat || '') + '</div>' +

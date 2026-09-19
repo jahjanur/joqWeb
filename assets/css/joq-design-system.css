@@ -3995,6 +3995,7 @@ button[class*="joq-"]:focus-visible,
 .home-category-image a,
 .image-holder,
 .photo-article-sys4,
+.modul-photo-sys3,
 .adunit-1 {
   background-color: var(--gray-100);
   background-image: var(--joq-fallback);

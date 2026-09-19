@@ -217,7 +217,8 @@
 		    				</h1>
 		    			</div>
 		    			<div class="joq-post__meta">
-		    				<span class="joq-post__author">Shkruar nga: <?php echo get_the_author_meta('first_name') ?> <?php echo get_the_author_meta('last_name') ?></span>
+		    				<?php $joqAuthor = joq_author_line(); ?>
+                            <?php if ( $joqAuthor ) : ?><span class="joq-post__author">Shkruar nga: <?php echo esc_html( $joqAuthor ); ?></span><?php endif; ?>
 		    				<span class="joq-post__meta-sep"></span>
 		    				<time datetime="<?php echo get_the_date( 'c' ); ?>">Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i' );?></time>
 		    				<?php if (get_field('english_news_id')) { ?>
@@ -253,9 +254,11 @@
 		    				</button>
 		    			</div>
 
+		    			<?php /* box always renders; with no thumbnail its fallback mark shows */ ?>
 		    			<div class="joq-post__image">
-		    				<img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $ID,'full' )); ?>" alt="<?php echo the_title(); ?>">
-		    				<div class="joq-post__image-caption"><?php echo the_post_thumbnail_caption() ?></div>
+		    				<?php echo joq_thumb_img( $ID, 'full', array( 'alt' => get_the_title(), 'width' => false, 'height' => false, 'loading' => false ) ); ?>
+		    				<?php $joqCaption = trim( (string) get_the_post_thumbnail_caption() ); ?>
+		    				<?php if ( $joqCaption ) : ?><div class="joq-post__image-caption"><?php echo $joqCaption; ?></div><?php endif; ?>
 		    			</div>
 
 
@@ -384,14 +387,14 @@
 										<div class="article-wrapper" style="width: 33.3333%">
 											<a href="<?php echo get_permalink( $p->ID ); ?>">
 												<div class="article-image">
-													<img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID)) ?>" alt="JoqAlbania">
+													<?php echo joq_thumb_img( $p->ID, 'img2', array( 'alt' => get_the_title( $p->ID ), 'width' => false, 'height' => false ) ); ?>
 												</div>
 												<div class="article-title">
 													<div class="article-title-wrapper">
 														<?php echo $p->post_title ?>
 													</div>
 													<div class="home-category-post-author mobile-only">
-										                Shkruar nga: <?php echo get_the_author_meta('first_name', $p->post_author) ?> <?php echo get_the_author_meta('last_name', $p->post_author) ?> | Publikuar më: <?php echo  get_the_date( 'd.m.Y, H:i', $p->ID );?>
+										                <?php $relAuthor = joq_author_line( $p ); if ( $relAuthor ) : ?>Shkruar nga: <?php echo esc_html( $relAuthor ); ?> | <?php endif; ?>Publikuar më: <?php echo  get_the_date( 'd.m.Y, H:i', $p->ID );?>
 										            </div>
 												</div>
 												<div class="mobile-only" style="clear: both;"></div>

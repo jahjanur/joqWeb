@@ -105,7 +105,7 @@ foreach ($posts as $p) :
 
 <a href="<?php echo get_permalink( $p->ID ); ?>">
 <div class="modul-box-sys3">
-<div class="modul-photo-sys3"><img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'thumbnail' )) ?>"></div>
+<div class="modul-photo-sys3"><?php echo joq_thumb_img( $p->ID, 'thumbnail', array( 'alt' => $p->post_title, 'width' => false, 'height' => false, 'loading' => false ) ); ?></div>
 <div class="photo-text-modul-sys3"> <?php echo $p->post_title ?> </div>
 </div>
 </a>
@@ -165,8 +165,8 @@ foreach ($posts as $p) :
 
 <div class="last-news-article-wrapper">
     <a href="<?php echo get_permalink( $p->ID ); ?>">
-        <div class="article-image" 
-            style="background-image: url(<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'img2' )) ?>);">
+        <?php $tnpImg = fix_post_thumbnail( get_the_post_thumbnail_url( $p->ID, 'img2' ) ); ?>
+        <div class="article-image"<?php if ( $tnpImg ) : ?> style="background-image: url(<?php echo esc_url( $tnpImg ); ?>);"<?php endif; ?>>
         </div>
         <div class="article-title">
             <?php echo $p->post_title ?>

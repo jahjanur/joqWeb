@@ -25,7 +25,7 @@ $ajaxLoad = 1;
 	<div class="fourContent-wrapper">
 	<div class="image-holder">
 	<a href="<?php echo get_permalink(); ?>">
-	<img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>" alt="<?php echo the_title(); ?>"/>
+	<?php echo joq_thumb_img( get_the_ID(), 'img2', array( 'alt' => get_the_title(), 'width' => false, 'height' => false, 'loading' => false ) ); ?>
 	</a>
 	</div>
 	<div class="content-holder">
@@ -73,7 +73,8 @@ $ajaxLoad = 1;
 
 	<div class="article-wrapper" style="width: 25%;">
         <a href="<?php echo get_permalink() ?>">
-            <div class="article-image" style="padding-bottom: 75%; background-image: url(<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>); background-size: cover; background-position: center;border-top-left-radius: 10px;border-top-right-radius: 10px;"></div>
+            <?php $lfnImg = fix_post_thumbnail( get_the_post_thumbnail_url( get_the_ID(), 'img2' ) ); ?>
+            <div class="article-image" style="padding-bottom: 75%;<?php if ( $lfnImg ) : ?> background-image: url(<?php echo esc_url( $lfnImg ); ?>);<?php endif; ?> background-size: cover; background-position: center;border-top-left-radius: 10px;border-top-right-radius: 10px;"></div>
             <div class="article-title">
                 <?php echo the_title(); ?>
             </div>
@@ -114,9 +115,9 @@ $ajaxLoad = 1;
 ?>
 
 	<div class="home-category-article">
+	    <?php $lfnImg3 = fix_post_thumbnail( get_the_post_thumbnail_url( get_the_ID(), 'img2' ) ); ?>
 	    <div class="home-category-image">
-	        <a href="<?php echo get_permalink() ?>" 
-	            style="background-image: url(<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( get_the_ID(),'img2' )) ?>);">
+	        <a href="<?php echo get_permalink() ?>"<?php if ( $lfnImg3 ) : ?> style="background-image: url(<?php echo esc_url( $lfnImg3 ); ?>);"<?php endif; ?>>
 	        </a>
 	    </div>
 	    <div class="home-category-post">
