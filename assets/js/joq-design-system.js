@@ -315,6 +315,29 @@
         }
 
         /* ---------------------------------------------------------------
+           Category archive — "Më shumë" reveals the next rows
+           --------------------------------------------------------------- */
+        var catMoreBtn = qs('#load-more-art');
+
+        if (catMoreBtn) {
+            var catHidden = qsa('.joq-category__article.is-hidden');
+            var catStep   = parseInt(catMoreBtn.getAttribute('data-step'), 10) || 10;
+            var catAt     = 0;
+
+            catMoreBtn.addEventListener('click', function () {
+                var upto = Math.min(catAt + catStep, catHidden.length);
+                for (; catAt < upto; catAt++) {
+                    catHidden[catAt].classList.remove('is-hidden');
+                }
+                if (catAt >= catHidden.length) {
+                    catMoreBtn.parentNode.hidden = true;
+                }
+            });
+
+            if (!catHidden.length) { catMoreBtn.parentNode.hidden = true; }
+        }
+
+        /* ---------------------------------------------------------------
            [data-animate] scroll reveals
            --------------------------------------------------------------- */
         var animated = qsa('[data-animate]');

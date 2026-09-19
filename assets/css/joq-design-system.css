@@ -3579,6 +3579,11 @@ button[class*="joq-"]:focus-visible,
 /* Load more — under the grid it appends to */
 .joq-load-more { text-align: center; margin-top: 24px; }
 .joq-category__load-btn { font-family: inherit; }
+/* newstyle.css clips this list to a fixed 2300px (1345px on mobile) and the old
+   button just grew that number, so a short archive ended in hundreds of pixels
+   of empty band. The list is its content's height now; the button reveals rows. */
+.category-article-list { height: auto !important; overflow: visible !important; }
+.joq-category__article.is-hidden { display: none; }
 .joq-category__load-btn:disabled,
 .joq-category__load-btn.is-loading {
   opacity: .6;

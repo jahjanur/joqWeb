@@ -44,7 +44,7 @@ $joq_404_cats = array(
     <link rel="icon" href="<?php echo $joq_theme_uri; ?>/assets/images/icons/icon.png" />
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="<?php echo $joq_theme_uri; ?>/assets/css/joq-design-system.css?v=5.5" type="text/css" />
+    <link rel="stylesheet" href="<?php echo $joq_theme_uri; ?>/assets/css/joq-design-system.css?v=5.6" type="text/css" />
 </head>
 
 <body>
@@ -118,7 +118,7 @@ $joq_404_cats = array(
 
 <?php get_template_part( 'templates/joqFooter' ); ?>
 
-<script src="<?php echo $joq_theme_uri; ?>/assets/js/joq-design-system.js?v=3.7"></script>
+<script src="<?php echo $joq_theme_uri; ?>/assets/js/joq-design-system.js?v=3.8"></script>
 
 </body>
 </html>

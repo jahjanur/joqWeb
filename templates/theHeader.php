@@ -102,7 +102,7 @@ $categorySlug = $thiscat->slug;
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/static_p.css?v=1.01" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.5" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.6" type="text/css" />
 
 
 

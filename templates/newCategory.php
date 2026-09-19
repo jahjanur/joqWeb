@@ -61,7 +61,7 @@
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.5" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.6" type="text/css" />
     
     <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
     <script>
@@ -190,8 +190,16 @@
 
                 <div class="category-article-list">
 
-	                <?php while ( have_posts() ) : the_post(); ?>
-	                <div class="joq-category__article">
+	                <?php
+	                  /* The whole archive is in the markup; the first ten are shown and
+	                     the rest revealed in tens by the button below. The class is set
+	                     here rather than by JS because this page is cached as static
+	                     HTML -- doing it on load would flash the full list first. */
+	                  $joq_cat_i    = 0;
+	                  $joq_cat_step = 10;
+	                ?>
+	                <?php while ( have_posts() ) : the_post(); $joq_cat_i++; ?>
+	                <div class="joq-category__article<?php echo $joq_cat_i > $joq_cat_step ? ' is-hidden' : ''; ?>">
 	                    
 	                    <div class="joq-category__article-img">
 	                        <a href="<?php echo get_permalink(); ?>">
@@ -217,35 +225,15 @@
 
                 </div>
 
+                <?php /* Without JS nothing can reveal the rest, so show everything. */ ?>
+                <noscript><style>.joq-category__article.is-hidden{display:flex}.joq-category__load-more{display:none}</style></noscript>
+
+                <?php if ( $joq_cat_i > $joq_cat_step ) : ?>
                 <div class="joq-category__load-more">
-	                <div id="load-more-art" class="joq-category__load-btn">
-	                    Më shumë
-	                </div>
-	                <script type="text/javascript">
-	                	if ($(window).width() <= 600) {
-							let height = 1345;
-		                	$('#load-more-art').on('click', function (argument) {
-		                		if (height < 12100) {
-				                	height += 1350;
-				                	$('.category-article-list').css('height', height + 'px');	
-			                	} else {
-			                		$('#load-more-art').remove();
-			                	}
-		                	});
-	                	} else {
-		                	let height = 2300;
-		                	$('#load-more-art').on('click', function (argument) {
-		                		if (height < 23000) {
-				                	height += 2320;
-				                	$('.category-article-list').css('height', height + 'px');	
-			                	} else {
-			                		$('#load-more-art').remove();
-			                	}
-		                	});	
-	                	}
-	                	
-	                </script>
+	                <button type="button" id="load-more-art" class="joq-category__load-btn"
+	                        data-step="<?php echo (int) $joq_cat_step; ?>">M&euml; shum&euml;</button>
 	            </div>
+	            <?php endif; ?>
 
             </div>
             <!-- End Category News List -->
@@ -469,7 +457,7 @@ get_template_part( 'templates/joqFooter' );
     <script src="https://static.joq-albania.com/assets/js/newscript.js" type="text/javascript"></script>
     <script src="https://static.joq-albania.com/assets/js/bannersys.js?v2.05" type="text/javascript"></script>
 
-    <script src="/wp-content/themes/joq/assets/js/joq-design-system.js?v=3.7"></script>
+    <script src="/wp-content/themes/joq/assets/js/joq-design-system.js?v=3.8"></script>
 </body>
 
 </html>
