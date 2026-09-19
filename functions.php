@@ -700,3 +700,99 @@ function joq_author_line( $post = null ) {
     $last  = trim( (string) get_the_author_meta( 'last_name', $post->post_author ) );
     return trim( $first . ' ' . $last );
 }
+
+/* ==========================================================================
+   ROUTING
+   The theme ships no page.php and no root search.php, so WordPress fell back
+   to index.php -- the homepage -- for every /faqe/* URL, for /kerko.html and
+   for the two categories the cache writes to /{slug}/index.html. In production
+   those paths are served from disk before WordPress sees them; the moment a
+   cached file is missing the homepage answered in its place.
+   ========================================================================== */
+
+add_action( 'init', 'joq_register_routes' );
+function joq_register_routes() {
+    /* Static pages: /faqe/rreth-nesh.html and friends. */
+    add_rewrite_rule( '^faqe/([a-z0-9-]+)\.html$', 'index.php?joq_page=$matches[1]', 'top' );
+
+    /* Search results. The form has always submitted ?search=; see joq_map_search_param. */
+    add_rewrite_rule( '^kerko\.html$', 'index.php?s=', 'top' );
+
+    /* footer.php writes these three categories to /{slug}/index.html instead of
+       /kategori/{slug}.html, and the nav links there. Identical to the rule the
+       local dev shim adds, so the two collapse into one entry rather than fight. */
+    add_rewrite_rule( '^(kosova|maqedoni|english)/index\.html$', 'index.php?category_name=$matches[1]', 'top' );
+
+    /* Flushing on every request is expensive; flush once per rule revision. */
+    if ( get_option( 'joq_routes_version' ) !== JOQ_ROUTES_VERSION ) {
+        flush_rewrite_rules( false );
+        update_option( 'joq_routes_version', JOQ_ROUTES_VERSION );
+    }
+}
+
+if ( ! defined( 'JOQ_ROUTES_VERSION' ) ) {
+    define( 'JOQ_ROUTES_VERSION', '1' );
+}
+
+add_filter( 'query_vars', 'joq_query_vars' );
+function joq_query_vars( $vars ) {
+    $vars[] = 'joq_page';
+    return $vars;
+}
+
+/**
+ * The search overlay has always submitted ?search=, and links to
+ * /kerko.html?search=... exist in cached pages and in the wild. Map it onto
+ * WordPress's own `s` so both spellings work.
+ */
+add_filter( 'request', 'joq_map_search_param' );
+function joq_map_search_param( $qv ) {
+    if ( isset( $qv['s'] ) && $qv['s'] === '' && ! empty( $_GET['search'] ) ) {
+        $qv['s'] = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+    }
+    return $qv;
+}
+
+/**
+ * Search results are one page, not one per 10 posts' worth of scrolling.
+ */
+add_action( 'pre_get_posts', 'joq_search_page_size' );
+function joq_search_page_size( $query ) {
+    if ( ! is_admin() && $query->is_main_query() && $query->is_search() ) {
+        $query->set( 'posts_per_page', 20 );
+    }
+}
+
+/**
+ * WordPress would 301 /faqe/x.html to /faqe/x/ and /kosova/index.html to
+ * /kategori/kosova/, which are not the URLs this site publishes.
+ */
+add_filter( 'redirect_canonical', 'joq_keep_html_urls' );
+function joq_keep_html_urls( $redirect ) {
+    if ( get_query_var( 'joq_page' ) || is_search() ) {
+        return false;
+    }
+    if ( is_category() && preg_match( '#/(kosova|maqedoni|english)/index\.html#', $_SERVER['REQUEST_URI'] ) ) {
+        return false;
+    }
+    return $redirect;
+}
+
+/**
+ * Hand /faqe/{slug}.html to its template. An editor-created Page with the same
+ * slug wins over the shipped copy, so prose can move into the CMS later without
+ * a code change.
+ */
+add_filter( 'template_include', 'joq_page_template' );
+function joq_page_template( $template ) {
+    $slug = get_query_var( 'joq_page' );
+    if ( ! $slug ) {
+        return $template;
+    }
+    $live = get_template_directory() . '/templates/pages/live.php';
+    if ( $slug === 'live' && file_exists( $live ) ) {
+        return $live;
+    }
+    $dispatcher = get_template_directory() . '/templates/pages/joq-page.php';
+    return file_exists( $dispatcher ) ? $dispatcher : $template;
+}

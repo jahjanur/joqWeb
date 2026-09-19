@@ -2738,6 +2738,38 @@ body.menu-open { overflow: hidden; }
   gap: 8px;
   flex-shrink: 0;
 }
+/* Error state: the player wrapper is the 16:9 black box, so this overlays it. */
+.joq-live__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 24px;
+  background: var(--gray-900);
+  color: var(--white);
+}
+.joq-live__error[hidden] { display: none; }
+.joq-live__error-title { font-size: 18px; font-weight: 800; }
+.joq-live__error-text { font-size: 14px; color: rgba(255,255,255,.65); }
+.joq-live__retry {
+  margin-top: 8px;
+  padding: 11px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .25s var(--ease);
+}
+.joq-live__retry:hover { background: var(--white); color: var(--gray-900); }
+.joq-live__player video { width: 100%; height: 100%; object-fit: contain; background: #000; }
 .joq-live__social {
   width: 40px; height: 40px;
   display: flex;
@@ -2801,6 +2833,17 @@ body.menu-open { overflow: hidden; }
   color: var(--red);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+/* Says plainly that a page is not final yet, instead of letting a placeholder
+   read like the published policy. */
+.joq-static__notice {
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  border-left: 3px solid var(--red);
+  border-radius: 0 10px 10px 0;
+  background: var(--gray-50);
+  font-size: 14.5px;
+  color: var(--gray-600);
 }
 .joq-static__content ul,
 .joq-static__content ol {
