@@ -772,7 +772,13 @@ function joq_keep_html_urls( $redirect ) {
     if ( get_query_var( 'joq_page' ) || is_search() ) {
         return false;
     }
-    if ( is_category() && preg_match( '#/(kosova|maqedoni|english)/index\.html#', $_SERVER['REQUEST_URI'] ) ) {
+    /* Every public URL on this site ends in .html -- /artikull/123.html,
+       /kategori/sport.html, /kosova/index.html, /faqe/kontakto.html. The
+       permalink structure ends in a slash, so WordPress's canonical redirect
+       wants to send all of them to a trailing-slash variant that does not
+       exist. Leave any .html request exactly where it is. */
+    $path = isset( $_SERVER['REQUEST_URI'] ) ? parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) : '';
+    if ( $path && substr( $path, -5 ) === '.html' ) {
         return false;
     }
     return $redirect;
