@@ -134,7 +134,7 @@ $joq_theme_uri = '/wp-content/themes/joq';
         <label class="joq-search__label" for="joq-search-input">K&euml;rko n&euml; JOQ Albania</label>
         <form class="joq-search__form" action="/kerko.html" method="GET">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="joq-search-input" name="search" spellcheck="false" placeholder="K&euml;rko dhe shtyp enter" required />
+            <input type="text" id="joq-search-input" name="s" spellcheck="false" placeholder="K&euml;rko dhe shtyp enter" required />
         </form>
     </div>
 </div>
