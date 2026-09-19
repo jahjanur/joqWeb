@@ -67,7 +67,7 @@
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v1.02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.9" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=6.0" type="text/css" />
     
     <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
     <script>
@@ -201,13 +201,17 @@
 		    				<a href="/">Kryefaqja</a>
 		    				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
 		    				<?php if ( ! empty( $postCats ) ) : ?>
-		    					<a href="/kategori/<?php echo $postCats[0]->slug; ?>.html"><?php echo $postCats[0]->cat_name; ?></a>
+		    					<a href="/kategori/<?php echo $postCats[0]->slug; ?>.html"><?php echo joq_cat_icon_img( $postCats[0]->slug, 'joq-breadcrumb__icon' ); ?><?php echo $postCats[0]->cat_name; ?></a>
 		    					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
 		    				<?php endif; ?>
 		    				<span><?php echo wp_trim_words( get_the_title(), 7, '...' ); ?></span>
 		    			</nav>
 
 		    			<?php if ( ! empty( $postCats ) ) : ?>
+		    				<?php /* No icon here on purpose: this chip is solid brand red and the
+		    				   icon set is drawn in the same red and black, so marks like
+		    				   persekutimi-ndaj-joq turn to mud on it. The breadcrumb above
+		    				   carries the icon instead, on a light background. */ ?>
 		    				<a class="joq-post__cat" href="/kategori/<?php echo $postCats[0]->slug; ?>.html"><?php echo $postCats[0]->cat_name; ?></a>
 		    			<?php endif; ?>
 

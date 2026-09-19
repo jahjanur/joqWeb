@@ -2459,6 +2459,26 @@ body.menu-open { overflow: hidden; }
   align-items: center;
   gap: 12px;
 }
+/* One em square, same rule the homepage section headings use, so the mark
+   always matches the type beside it. The header's 12px gap belongs to the red
+   bar; the icon belongs to the word, so it sits closer. */
+.joq-category__title-icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: block;
+  margin-right: -5px;
+}
+.joq-breadcrumb__icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: -.22em;
+  margin-right: 5px;
+}
 .joq-category__title::before {
   content: '';
   width: 5px; height: 28px;

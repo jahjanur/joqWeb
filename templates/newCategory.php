@@ -61,7 +61,7 @@
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.9" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=6.0" type="text/css" />
     
     <script async='async' src='https://www.googletagservices.com/tag/js/gpt.js'></script>
     <script>
@@ -184,7 +184,7 @@
 				</div>
 
                 <div class="joq-category__header">
-                    <h1 class="joq-category__title"><?php echo single_cat_title(); ?></h1>
+                    <h1 class="joq-category__title"><?php echo joq_cat_icon_img( $thiscat->slug, 'joq-category__title-icon' ); ?><?php echo single_cat_title(); ?></h1>
                     <div class="joq-category__count"><?php global $wp_query; echo (int) $wp_query->found_posts; ?> artikuj</div>
                 </div>
 
