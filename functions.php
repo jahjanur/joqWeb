@@ -657,3 +657,46 @@ function joq_popular_posts_in_category( $cat_id, $limit = 4 ) {
     ) );
     return $q->posts;
 }
+
+/**
+ * The <img> for a post's thumbnail, or '' when it has none.
+ *
+ * fix_post_thumbnail( false ) returns '', and an <img src=""> re-requests the
+ * page and paints the browser's broken glyph. Every loop goes through here so a
+ * missing picture emits nothing and the wrapper's fallback mark shows instead.
+ */
+function joq_thumb_img( $post_id, $size = 'img2', $attrs = array() ) {
+    $url = fix_post_thumbnail( get_the_post_thumbnail_url( $post_id, $size ) );
+    if ( ! $url ) {
+        return '';
+    }
+    $attrs = array_merge( array(
+        'alt'      => '',
+        'width'    => '527',
+        'height'   => '375',
+        'loading'  => 'lazy',
+        'decoding' => 'async',
+    ), $attrs );
+    $html = '<img src="' . esc_url( $url ) . '"';
+    foreach ( $attrs as $k => $v ) {
+        if ( $v === false || $v === null ) {
+            continue;
+        }
+        $html .= ' ' . $k . '="' . esc_attr( $v ) . '"';
+    }
+    return $html . ' />';
+}
+
+/**
+ * "First Last" for the post's author, or '' when neither name is set.
+ * Callers print nothing in that case rather than a bare "Shkruar nga:".
+ */
+function joq_author_line( $post = null ) {
+    $post = get_post( $post );
+    if ( ! $post ) {
+        return '';
+    }
+    $first = trim( (string) get_the_author_meta( 'first_name', $post->post_author ) );
+    $last  = trim( (string) get_the_author_meta( 'last_name', $post->post_author ) );
+    return trim( $first . ' ' . $last );
+}

@@ -82,7 +82,7 @@ if ( $joq_hero_q->have_posts() ) {
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.4" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=5.5" type="text/css" />
 
     <script src="https://static.joq-albania.com/assets/js/jquery.min.js" type="text/javascript"></script>
   <script async src="https://static.joq-albania.com/assets/js/jquery.dfp.min.js" type="text/javascript"></script>
@@ -586,7 +586,7 @@ if ( $joq_hero_q->have_posts() ) {
                           '</a></article>');
                       });
 
-                      var n = $('.loadTopNews .joq-trending__item').not('.is-skeleton').length;
+                      var n = $('.loadTopNews .joq-trending__item').length;
                       (items.top || []).forEach(function (article) {
                         n++;
                         $('.loadTopNews').append('<article class="joq-trending__item">' +
@@ -704,6 +704,46 @@ if ( $joq_hero_q->have_posts() ) {
       </section>
       <!-- End Aktualitet + Të fundit -->
 
+      <?php
+        /* Argëtim row: a light closing note so the page does not fade out after
+           the feed, and so the ad band below sits between two content sections
+           instead of floating on its own. Skipped entirely when the category is
+           empty rather than rendering a heading over nothing. */
+        $joq_row_q = new WP_Query( array(
+          'post_type'           => 'post',
+          'post_status'         => 'publish',
+          'category_name'       => 'argetim',
+          'posts_per_page'      => 4,
+          'post__not_in'        => $joq_shown,
+          'ignore_sticky_posts' => true,
+          'no_found_rows'       => true,
+        ) );
+        foreach ( $joq_row_q->posts as $rowP ) { $joq_shown[] = $rowP->ID; }
+      ?>
+      <?php if ( $joq_row_q->have_posts() ) : ?>
+      <!-- Argëtim row -->
+      <section class="joq-section joq-home-row" data-animate>
+        <div class="joq-section__header">
+          <h2 class="joq-section__title"><?php echo joq_cat_icon_img( 'argetim', 'joq-section__title-icon' ); ?>Arg&euml;tim</h2>
+          <a class="joq-section__more" href="/kategori/argetim.html">Shiko t&euml; gjitha &rarr;</a>
+        </div>
+        <div class="joq-grid">
+          <?php foreach ( $joq_row_q->posts as $rowP ) : ?>
+          <article class="joq-card">
+            <a class="joq-card__link" href="<?php echo get_permalink( $rowP->ID ); ?>">
+              <div class="joq-card__img"><?php echo joq_thumb_img( $rowP->ID ); ?></div>
+              <div class="joq-card__body">
+                <h3 class="joq-card__title"><?php echo get_the_title( $rowP->ID ); ?></h3>
+                <div class="joq-card__time"><time datetime="<?php echo get_the_date( 'c', $rowP->ID ); ?>"><?php echo joq_time_ago( $rowP ); ?></time></div>
+              </div>
+            </a>
+          </article>
+          <?php endforeach; ?>
+        </div>
+      </section>
+      <!-- End Argëtim row -->
+      <?php endif; ?>
+
       <!-- Ad band -->
       <div class="joq-adrow pc-only">
         <span class="joq-adrow__label">Reklam&euml;</span>
@@ -711,28 +751,63 @@ if ( $joq_hero_q->have_posts() ) {
         <div class="adunit-1" data-adunit="joq__300x250-9" data-dimensions="300x250"></div>
       </div>
 
-      <!-- Most read: skeleton cards hold the space until the AJAX fragment lands -->
+      <?php
+        /* Most read, rendered here rather than fetched. The old AJAX fragment had
+           no failure path, so a missing file left four shimmering skeletons on
+           the page for good. The readership ranking comes from the same API,
+           and any shortfall (API down, quiet day) is topped up with the latest
+           stories not already on the page, so the strip is never empty or fake. */
+        $joq_top_ids = joq_popular_post_ids();
+        $joq_top     = array();
+        if ( $joq_top_ids ) {
+          $joq_top_q = new WP_Query( array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'post__in'            => $joq_top_ids,
+            'orderby'             => 'post__in',
+            'posts_per_page'      => 5,
+            'ignore_sticky_posts' => true,
+            'no_found_rows'       => true,
+          ) );
+          $joq_top = $joq_top_q->posts;
+        }
+        if ( count( $joq_top ) < 5 ) {
+          $joq_fill_q = new WP_Query( array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => 5 - count( $joq_top ),
+            'post__not_in'        => array_merge( $joq_shown, wp_list_pluck( $joq_top, 'ID' ) ),
+            'ignore_sticky_posts' => true,
+            'no_found_rows'       => true,
+          ) );
+          $joq_top = array_merge( $joq_top, $joq_fill_q->posts );
+        }
+        /* Veç e jona renders below this and should not repeat what is already
+           sitting in the most-read strip. */
+        foreach ( $joq_top as $topShown ) { $joq_shown[] = $topShown->ID; }
+      ?>
+      <?php if ( $joq_top ) : ?>
+      <!-- Most read -->
       <section class="joq-section" data-animate>
         <div class="joq-section__header">
           <h2 class="joq-section__title">M&euml; t&euml; lexuarat</h2>
         </div>
-        <div class="loadTopNews joq-trending" aria-busy="true">
-          <?php for ( $sk = 1; $sk <= 4; $sk++ ) : ?>
-          <div class="joq-trending__item is-skeleton" aria-hidden="true">
-            <div class="joq-trending__top">
-              <span class="joq-trending__num"><?php echo str_pad( $sk, 2, '0', STR_PAD_LEFT ); ?></span>
-              <div class="joq-trending__img"></div>
-            </div>
-            <div class="joq-trending__title"><span></span><span></span></div>
-          </div>
-          <?php endfor; ?>
+        <div class="loadTopNews joq-trending">
+          <?php foreach ( $joq_top as $rank => $topP ) : ?>
+          <article class="joq-trending__item">
+            <a href="<?php echo get_permalink( $topP->ID ); ?>">
+              <div class="joq-trending__top">
+                <span class="joq-trending__num"><?php echo str_pad( $rank + 1, 2, '0', STR_PAD_LEFT ); ?></span>
+                <div class="joq-trending__img"><?php echo joq_thumb_img( $topP->ID ); ?></div>
+              </div>
+              <div class="joq-trending__title"><?php echo get_the_title( $topP->ID ); ?></div>
+            </a>
+          </article>
+          <?php endforeach; ?>
         </div>
-        <script type="text/javascript">
-          $.get( "/myAjax/top-news2.html", function( data ) {
-            $( ".loadTopNews" ).html( data ).attr( "aria-busy", "false" );
-          });
-        </script>
       </section>
+      <!-- End Most read -->
+      <?php endif; ?>
 
       <!-- Report CTA -->
       <section class="joq-report" data-animate>
@@ -774,24 +849,21 @@ if ( $joq_hero_q->have_posts() ) {
         <div>
         <?php
           $vecNum = 0;
-          $lastHeadlines = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => 5, 'post_status' => 'publish', 'category_name' => 'vec-e-jona' ) );
+          /* post__not_in: the Veç e jona category block higher up already shows
+             four of these, and the page should not repeat itself. */
+          $lastHeadlines = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => 5, 'post_status' => 'publish', 'category_name' => 'vec-e-jona', 'post__not_in' => $joq_shown, 'ignore_sticky_posts' => true ) );
           while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
             $vecNum++;
         ?>
           <article class="joq-list__item">
             <a href="<?php echo get_permalink(); ?>">
               <span class="joq-list__num"><?php echo $vecNum; ?></span>
-              <?php $vecImg = fix_post_thumbnail( get_the_post_thumbnail_url( get_the_ID(), 'img2' ) ); ?>
-              <div class="joq-list__img">
-                <?php if ( $vecImg ) : ?>
-                <img src="<?php echo $vecImg; ?>" alt="" width="527" height="375" loading="lazy" decoding="async" />
-                <?php endif; ?>
-              </div>
+              <div class="joq-list__img"><?php echo joq_thumb_img( get_the_ID() ); ?></div>
               <div class="joq-list__body">
                 <h3 class="joq-list__title"><?php echo get_the_title(); ?></h3>
                 <p class="joq-list__excerpt"><?php $text = wp_strip_all_tags( get_the_content() ); echo wp_trim_words( $text, 40, '...' ); ?></p>
                 <div class="joq-list__meta">
-                  Shkruar nga: <?php echo get_the_author_meta('first_name') ?> <?php echo get_the_author_meta('last_name') ?> | Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i' );?>
+                  <?php $vecAuthor = joq_author_line(); if ( $vecAuthor ) : ?>Shkruar nga: <?php echo esc_html( $vecAuthor ); ?> | <?php endif; ?>Publikuar m&euml;: <?php echo get_the_date( 'd.m.Y, H:i' );?>
                 </div>
               </div>
             </a>
