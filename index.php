@@ -82,7 +82,7 @@ if ( $joq_hero_q->have_posts() ) {
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=02" type="text/css" />
 
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=6.0" type="text/css" />
+    <link rel="stylesheet" href="/wp-content/themes/joq/assets/css/joq-design-system.css?v=6.1" type="text/css" />
 
     <script src="https://static.joq-albania.com/assets/js/jquery.min.js" type="text/javascript"></script>
   <script async src="https://static.joq-albania.com/assets/js/jquery.dfp.min.js" type="text/javascript"></script>
@@ -457,10 +457,14 @@ if ( $joq_hero_q->have_posts() ) {
                 <div class="joq-catblock__list">
                   <?php foreach ( $joq_block['items'] as $rowPost ) : ?>
                   <a class="joq-catblock__item" href="<?php echo get_permalink( $rowPost->ID ); ?>">
+                    <?php /* box always renders; with no thumbnail its fallback mark shows */ ?>
+                    <div class="joq-catblock__item-media"><?php echo joq_thumb_img( $rowPost->ID ); ?></div>
+                    <div class="joq-catblock__item-body">
                     <h3 class="joq-catblock__item-title"><?php echo get_the_title( $rowPost->ID ); ?></h3>
                     <div class="joq-catblock__meta">
                       <time datetime="<?php echo get_the_date( 'c', $rowPost->ID ); ?>"><?php echo joq_time_ago( $rowPost ); ?></time>
                       &middot; <?php echo joq_read_time( $rowPost ); ?> min lexim
+                    </div>
                     </div>
                   </a>
                   <?php endforeach; ?>
@@ -847,6 +851,18 @@ if ( $joq_hero_q->have_posts() ) {
       </section>
       <!-- End Report CTA -->
 
+      <?php
+        /* Queried before the section opens, the way Argëtim and Më të lexuarat
+           are. The heading used to print unconditionally with the loop inside,
+           so when post__not_in starved the query the page was left with a
+           titled, empty accent band -- the exact empty box this redesign
+           removed everywhere else.
+
+           post__not_in: the Veç e jona category block higher up already shows
+           four of these, and the page should not repeat itself. */
+        $lastHeadlines = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => 5, 'post_status' => 'publish', 'category_name' => 'vec-e-jona', 'post__not_in' => $joq_shown, 'ignore_sticky_posts' => true ) );
+      ?>
+      <?php if ( $lastHeadlines->have_posts() ) : ?>
       <!-- Home Vec e Jona -->
       <section class="joq-section joq-section--accent" data-animate>
         <div class="joq-section__header">
@@ -857,9 +873,6 @@ if ( $joq_hero_q->have_posts() ) {
         <div>
         <?php
           $vecNum = 0;
-          /* post__not_in: the Veç e jona category block higher up already shows
-             four of these, and the page should not repeat itself. */
-          $lastHeadlines = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => 5, 'post_status' => 'publish', 'category_name' => 'vec-e-jona', 'post__not_in' => $joq_shown, 'ignore_sticky_posts' => true ) );
           while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
             $vecNum++;
         ?>
@@ -880,6 +893,7 @@ if ( $joq_hero_q->have_posts() ) {
         </div>
       </section>
       <!-- End Home Vec e Jona -->
+      <?php endif; ?>
 
     </main>
 

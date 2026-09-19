@@ -3943,23 +3943,49 @@ button[class*="joq-"]:focus-visible,
   color: var(--gray-500);
 }
 
+/* A row: thumbnail left, headline and meta right -- the same shape as
+   .joq-post__sidebar-article, so these read as the design system's own list
+   component rather than a fourth arrangement. The lead's large picture already
+   sits on the right of the block, which is why the thumbs go left.
+
+   Note the axis: the item used to be a column, where justify-content was doing
+   the VERTICAL spreading that makes the three headlines span the lead's height.
+   In a row that property controls the horizontal axis instead, so the vertical
+   rules move to align-items. */
 .joq-catblock__item {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   flex: 1;
   padding: 11px 0;
   border-bottom: 1px solid var(--gray-200);
 }
-.joq-catblock__item:first-child { padding-top: 0; justify-content: flex-start; }
-.joq-catblock__item:last-child { border-bottom: none; padding-bottom: 0; justify-content: flex-end; }
+.joq-catblock__item:first-child { padding-top: 0; align-items: flex-start; }
+.joq-catblock__item:last-child { border-bottom: none; padding-bottom: 0; align-items: flex-end; }
+.joq-catblock__item-media {
+  flex: 0 0 auto;
+  width: 84px;
+  aspect-ratio: 16 / 11;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--gray-100);
+}
+.joq-catblock__item-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s var(--ease-out);
+}
+.joq-catblock__item:hover .joq-catblock__item-media img { transform: scale(1.05); }
+/* min-width:0 lets the clamped title shrink instead of forcing the row wider */
+.joq-catblock__item-body { flex: 1; min-width: 0; }
 .joq-catblock__item-title {
   font-size: 14.5px;
   font-weight: 700;
   line-height: 1.32;
   color: var(--gray-900);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color .2s var(--ease);
@@ -4120,6 +4146,7 @@ button[class*="joq-"]:focus-visible,
    ========================================================================== */
 .joq-story__media,
 .joq-catblock__lead-media,
+.joq-catblock__item-media,
 .joq-post__sidebar-img,
 .joq-list__img,
 .joq-trending__img,
