@@ -25,16 +25,18 @@ if ( $joq_cache ) {
     <title>Transmetim direkt &mdash; JOQ Albania</title>
     <meta name="description" content="Shiko TVA News direkt n&euml; JOQ Albania." />
     <link rel="canonical" href="https://joq-albania.com/faqe/live.html" />
-    <meta property="og:type" content="video.other" />
-    <meta property="og:locale" content="sq_AL" />
-    <meta property="og:title" content="Transmetim direkt - JOQ Albania" />
-    <meta property="og:url" content="https://joq-albania.com/faqe/live.html" />
+    <?php echo joq_social_meta( array(
+        'title'       => 'Transmetim direkt - JOQ Albania',
+        'description' => 'Shiko TVA News direkt në JOQ Albania.',
+        'url'         => 'https://joq-albania.com/faqe/live.html',
+        'type'        => 'video.other',
+    ) ); ?>
 
     <link rel="icon" href="<?php echo $joq_theme_uri; ?>/assets/images/icons/icon.png" />
     <link rel="preconnect" href="https://live.tvanews.com" />
     <link rel="stylesheet" href="https://static.joq-albania.com/assets/css/newstyle.css?v=1.02" type="text/css" />
     <!-- JOQ design system: must stay last so it wins the cascade -->
-    <link rel="stylesheet" href="<?php echo $joq_theme_uri; ?>/assets/css/joq-design-system.css?v=6.0" type="text/css" />
+    <link rel="stylesheet" href="<?php echo $joq_theme_uri; ?>/assets/css/joq-design-system.css?v=6.1" type="text/css" />
 </head>
 
 <body>
