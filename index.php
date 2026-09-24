@@ -683,7 +683,7 @@ if ( $joq_hero_q->have_posts() ) {
                   ?>
                   <div class="joq-latest__ad mob-pc-banner-wrapper">
                       <a href="https://aleancaetike.media/decent-invest-offer-easily/" target="_blank">
-                          <img style="width: 100%; max-width:300px;" src="/b/ame/300x260/2020-27-10.jpg" alt="" />
+                          <img style="width: 100%; max-width:300px;" src="/b/ame/300x260/2020-27-10.jpg" alt="Reklam&euml;: Decent Invest" loading="lazy" decoding="async" />
                       </a>
                   </div>
                   <?php
@@ -903,7 +903,7 @@ if ( $joq_hero_q->have_posts() ) {
 <?php get_template_part( 'templates/joqFooter' ); ?>
 
     <a href="https://wa.me/+355699299998" id="whatsapp-button" class="mobile-only">
-        <img width="24px" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg">
+        <img width="24px" height="24" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg" alt="D&euml;rgo denoncim n&euml; WhatsApp" decoding="async">
     </a>
 
 

@@ -360,7 +360,7 @@
 
 	                        <!-- <div class="mobile-only" style="text-align: center; height:auto; margin:0 auto 5px;">
 		                        <a href="https://www.youtube.com/channel/UCVsMVFcGZgxXTl5A-usiIBQ/?sub_confirmation=1" target="_blank">
-		                        	<img width="300" src="https://joq-albania.com/b/ytb/31/29-09-2022.jpg">
+		                        	<img width="300" src="https://joq-albania.com/b/ytb/31/29-09-2022.jpg" alt="Abonohu n&euml; kanalin e JOQ Albania n&euml; YouTube" loading="lazy" decoding="async">
 		                        </a>
 		                    </div> -->
 
@@ -656,7 +656,7 @@
 
                     <div class="pc-only" style="width:300px; height:auto; margin-bottom:5px;">
                         <a href="https://www.instagram.com/esp_oil/" target="_blank">
-                        	<img width="300" src="https://joq-albania.com/b/esp_oil/325/06-05-2026.gif">
+                        	<img width="300" src="https://joq-albania.com/b/esp_oil/325/06-05-2026.gif" alt="Reklam&euml;: ESP Oil" loading="lazy" decoding="async">
                         </a>
                     </div> 
 
@@ -682,7 +682,7 @@
 
                     <!-- <div class="pc-only" style="width:300px; height:auto; margin-bottom:5px;">
                         <a href="https://www.youtube.com/channel/UCVsMVFcGZgxXTl5A-usiIBQ/?sub_confirmation=1" target="_blank">
-                        	<img width="300" src="https://joq-albania.com/b/ytb/325/29-09-2022.jpg">
+                        	<img width="300" src="https://joq-albania.com/b/ytb/325/29-09-2022.jpg" alt="Abonohu n&euml; kanalin e JOQ Albania n&euml; YouTube" loading="lazy" decoding="async">
                         </a>
                     </div> -->
 
@@ -693,7 +693,7 @@
                                     var rc_country = JSON.parse(data).country;
                                     if (rc_country == 'AL') {
                                         try {
-                                            postscribe('#albsig-pc', '<a href="https://facebook.com/albsigalbania/" target="_blank"><img width="300" src="https://static.joq-albania.com/banners/albsig/albsig.gif"></a>');
+                                            postscribe('#albsig-pc', '<a href="https://facebook.com/albsigalbania/" target="_blank"><img width="300" src="https://static.joq-albania.com/banners/albsig/albsig.gif" alt="Reklam\u00eb: Albsig" loading="lazy" decoding="async"></a>');
                                         } catch (e) {}
                                     }
                                 });
@@ -745,7 +745,7 @@
 
                     <div class="pc-only" style="width:300px; height:auto; margin-bottom:5px;">
                       <a href="https://aleancaetike.media/decent-invest-offer-easily/" target="_blank">
-                        <img style="width: 100%;" src="/b/ame/300x50/2020-27-10.gif">
+                        <img style="width: 100%;" src="/b/ame/300x50/2020-27-10.gif" alt="Reklam&euml;: Decent Invest" loading="lazy" decoding="async">
                       </a>
                     </div>
 
@@ -786,7 +786,7 @@
 
 
 				<div id="fixed_728_banner" class="pc-only" style="position: fixed; bottom: 0; width: 728px; left: calc(50% - 364px); height: auto; z-index: 99999;  max-height: 90px; overflow: hidden;">
-			        <img id="remove_728_banner" src="https://static.joq-albania.com/assets/images/remove_banner.png" style="display: none; position: absolute; right: 0; top: 0; width: 24px; cursor: pointer;">
+			        <img id="remove_728_banner" src="https://static.joq-albania.com/assets/images/remove_banner.png" alt="Mbyll reklam&euml;n" loading="lazy" decoding="async" style="display: none; position: absolute; right: 0; top: 0; width: 24px; cursor: pointer;">
 			        <div class="adunit-1" data-adunit="joq__PC-Leaderboard-4" data-dimensions="728x90"></div>
 			    </div>
 				<div id="fb-share" class="mobile-only fixed-fbshare"></div>
@@ -903,7 +903,7 @@ get_template_part( 'templates/joqFooter' );
 
 
     <a href="https://wa.me/+355699299998" id="whatsapp-button" class="mobile-only">
-        <img width="24px" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg">
+        <img width="24px" height="24" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg" alt="D&euml;rgo denoncim n&euml; WhatsApp" decoding="async">
     </a>
 
 

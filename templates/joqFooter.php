@@ -127,7 +127,7 @@ if ( $joq_footer_last_news && ! empty( $joq_footer_last_news_cat ) ) {
         <!-- Brand + socials -->
         <div class="joq-footer__brand-row">
             <div class="joq-footer__brand">
-                <img class="joq-footer__logo" src="<?php echo $joq_theme_uri; ?>/assets/images/WhiteLogoJoq.svg" width="90" height="36" alt="JOQ Albania" />
+                <img class="joq-footer__logo" src="<?php echo $joq_theme_uri; ?>/assets/images/WhiteLogoJoq.svg" width="90" height="36" alt="JOQ Albania" loading="lazy" decoding="async" />
                 <p class="joq-footer__tagline">
                     Krijuar m&euml; 5 shkurt 2010, platforma m&euml; e madhe e lajmeve unike, arg&euml;tuese dhe sociale n&euml; hap&euml;sir&euml;n shqipfol&euml;se.
                 </p>
@@ -201,7 +201,7 @@ if ( $joq_footer_last_news && ! empty( $joq_footer_last_news_cat ) ) {
 
             <span class="joq-kape__content">
                 <span class="joq-kape__left">
-                    <img class="joq-kape__logo" src="<?php echo $joq_theme_uri; ?>/assets/images/KapeLogoWhite.svg" width="120" height="36" alt="Kape" />
+                    <img class="joq-kape__logo" src="<?php echo $joq_theme_uri; ?>/assets/images/KapeLogoWhite.svg" width="120" height="36" alt="Kape" loading="lazy" decoding="async" />
                     <span class="joq-kape__sub">Zbulo oferta dhe zbritje ekskluzive n&euml; Kape.al</span>
                 </span>
                 <span class="joq-kape__right">
