@@ -64,6 +64,10 @@ if ( $joq_hero_q->have_posts() ) {
         'description' => $joq_home_desc,
         'url'         => 'https://joq-albania.com/',
     ) ); ?>
+    <?php /* Tells Google which social accounts belong to this publisher --
+             what a knowledge panel is built from. Invisible to readers. */ ?>
+    <?php echo joq_organization_jsonld(); ?>
+
     <title>JOQ Albania</title>
 
   <link rel="shortcut icon" href="https://static.joq-albania.com/assets/images/facivon4.ico" type="image/x-icon">

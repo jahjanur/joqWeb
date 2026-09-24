@@ -863,3 +863,213 @@ function joq_social_meta( $args = array() ) {
     }
     return $out;
 }
+
+/* ------------------------------------------------------------------------
+   Structured data (schema.org JSON-LD)
+   ------------------------------------------------------------------------
+   The site had none at all -- not in this redesign and not in the theme it
+   replaced. It is what Google News and Google Discover read to decide whether
+   a page is a news story worth surfacing, so for a publisher this is the
+   largest remaining SEO lever. None of it is visible to a reader.
+   ------------------------------------------------------------------------ */
+
+/**
+ * Force a URL absolute.
+ *
+ * wp40547_filter_post_thumbnail_src() (line ~368) deliberately strips the
+ * scheme and host from attachment URLs -- `$image[0] = $parse['path']` -- so
+ * pages can be cached once and served from several domains. Images living
+ * under the legacy imagesNew/ path are then rewritten back to an absolute CDN
+ * URL by the same function, but an ordinary WordPress upload is not: it stays
+ * root-relative.
+ *
+ * That is fine inside an <img src>, where the browser resolves it against the
+ * current page. It is not fine in og:image, twitter:image or schema.org JSON,
+ * which are read by crawlers with no page context -- Facebook rejects a
+ * relative og:image outright and Google's validator flags a relative image.
+ */
+function joq_absolute_url( $url ) {
+    $url = trim( (string) $url );
+    if ( '' === $url ) {
+        return '';
+    }
+    if ( preg_match( '#^https?://#i', $url ) ) {
+        return $url;
+    }
+    if ( 0 === strpos( $url, '//' ) ) {
+        return 'https:' . $url;
+    }
+    return 'https://joq-albania.com/' . ltrim( $url, '/' );
+}
+
+/** Publisher logo for schema.org. Rectangular and inside Google's 600x60
+ *  box (this one is 150x60, the JOQ mark's natural 2.5:1). A square logo or
+ *  the 1200x630 share card would both be wrong here. */
+if ( ! defined( 'JOQ_PUBLISHER_LOGO' ) ) {
+    define( 'JOQ_PUBLISHER_LOGO', 'https://joq-albania.com/wp-content/themes/joq/assets/images/joq-publisher-logo.png' );
+}
+
+/**
+ * Wrap a data array in an application/ld+json <script>.
+ *
+ * Slashes are deliberately left escaped (no JSON_UNESCAPED_SLASHES): a post
+ * title containing "</script>" would otherwise close this tag early and the
+ * rest of the JSON would render as text on the page. Escaped, it becomes
+ * "<\/script>", which is still valid JSON and harmless. Unicode is left
+ * unescaped so Albanian characters stay readable in the source.
+ */
+function joq_jsonld_script( $data ) {
+    $json = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
+    if ( ! $json ) {
+        return '';
+    }
+    return '<script type="application/ld+json">' . $json . '</script>' . "\n";
+}
+
+/** The publisher, as both NewsArticle.publisher and the homepage Organization. */
+function joq_publisher_schema() {
+    return array(
+        '@type' => 'Organization',
+        'name'  => 'JOQ Albania',
+        'url'   => 'https://joq-albania.com/',
+        'logo'  => array(
+            '@type'  => 'ImageObject',
+            'url'    => JOQ_PUBLISHER_LOGO,
+            'width'  => 150,
+            'height' => 60,
+        ),
+    );
+}
+
+/**
+ * Trim a headline to Google's 110-character guidance, on a word boundary.
+ *
+ * Google truncates past 110 anyway; cutting it ourselves means we choose
+ * where, rather than being cut mid-word. Albanian headlines are long enough
+ * that this fires regularly, so it uses mb_* -- a byte-wise substr would slice
+ * a multi-byte e-diaeresis in half and produce invalid UTF-8 in the JSON.
+ */
+function joq_schema_headline( $title ) {
+    $title = trim( wp_strip_all_tags( (string) $title ) );
+    if ( mb_strlen( $title, 'UTF-8' ) <= 110 ) {
+        return $title;
+    }
+    $cut   = mb_substr( $title, 0, 110, 'UTF-8' );
+    $space = mb_strrpos( $cut, ' ', 0, 'UTF-8' );
+    if ( $space > 60 ) {
+        $cut = mb_substr( $cut, 0, $space, 'UTF-8' );
+    }
+    return rtrim( $cut, " \t\n\r\0\x0B.,;:-" ) . '...';
+}
+
+/**
+ * NewsArticle JSON-LD for a single post.
+ *
+ * Every value here is already rendered somewhere on the page -- this only
+ * restates it in the form a crawler can read without guessing.
+ */
+function joq_news_article_jsonld( $post = null ) {
+    $post = get_post( $post );
+    if ( ! $post || 'post' !== $post->post_type ) {
+        return '';
+    }
+
+    $url = 'https://joq-albania.com/artikull/' . $post->ID . '.html';
+
+    /* Real featured image when there is one; the share card otherwise. An
+       article with no image at all would fail Google's validator, and roughly
+       one post in six on this site has none. */
+    $image = joq_absolute_url( fix_post_thumbnail( get_the_post_thumbnail_url( $post->ID, 'full' ) ) );
+    if ( ! $image ) {
+        $image = JOQ_SHARE_IMAGE;
+    }
+
+    /* Most posts here are filed under the admin account with no first or last
+       name set, and an empty Person name is worse than no Person at all, so
+       those fall back to the organisation as author. */
+    $author_name = joq_author_line( $post );
+    $author      = $author_name
+        ? array( '@type' => 'Person', 'name' => $author_name )
+        : array( '@type' => 'Organization', 'name' => 'JOQ Albania' );
+
+    $data = array(
+        '@context'         => 'https://schema.org',
+        '@type'            => 'NewsArticle',
+        'mainEntityOfPage' => array( '@type' => 'WebPage', '@id' => $url ),
+        'headline'         => joq_schema_headline( $post->post_title ),
+        'description'      => wp_trim_words( wp_strip_all_tags( $post->post_content ), 40, '...' ),
+        'image'            => array( $image ),
+        'datePublished'    => get_the_date( 'c', $post ),
+        'dateModified'     => get_the_modified_date( 'c', $post ),
+        'author'           => $author,
+        'publisher'        => joq_publisher_schema(),
+        'inLanguage'       => 'sq-AL',
+    );
+
+    $cats = get_the_category( $post->ID );
+    if ( ! empty( $cats ) ) {
+        $data['articleSection'] = $cats[0]->cat_name;
+    }
+
+    return joq_jsonld_script( $data );
+}
+
+/**
+ * BreadcrumbList for a single post, mirroring the visible breadcrumb in
+ * newSingle.php exactly -- Kryefaqja > Category > Title. Search results can
+ * show this trail in place of a bare URL.
+ */
+function joq_breadcrumb_jsonld( $post = null ) {
+    $post = get_post( $post );
+    if ( ! $post ) {
+        return '';
+    }
+
+    $items = array(
+        array(
+            '@type'    => 'ListItem',
+            'position' => 1,
+            'name'     => 'Kryefaqja',
+            'item'     => 'https://joq-albania.com/',
+        ),
+    );
+
+    $cats = get_the_category( $post->ID );
+    if ( ! empty( $cats ) ) {
+        $items[] = array(
+            '@type'    => 'ListItem',
+            'position' => 2,
+            'name'     => $cats[0]->cat_name,
+            'item'     => 'https://joq-albania.com/kategori/' . $cats[0]->slug . '.html',
+        );
+    }
+
+    $items[] = array(
+        '@type'    => 'ListItem',
+        'position' => count( $items ) + 1,
+        'name'     => wp_strip_all_tags( $post->post_title ),
+    );
+
+    return joq_jsonld_script( array(
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => $items,
+    ) );
+}
+
+/**
+ * Organization for the homepage. Tells Google which social accounts belong to
+ * this publisher, which is how a knowledge panel gets its links right. The
+ * sameAs list is the same set of profiles the footer links to.
+ */
+function joq_organization_jsonld() {
+    $org = joq_publisher_schema();
+    $org['@context'] = 'https://schema.org';
+    $org['sameAs']   = array(
+        'https://www.facebook.com/joqalbania/',
+        'https://www.instagram.com/joqalbania/',
+        'https://www.youtube.com/channel/UCVsMVFcGZgxXTl5A-usiIBQ',
+        'https://twitter.com/JoqAlbania',
+    );
+    return joq_jsonld_script( $org );
+}
