@@ -772,6 +772,33 @@ function joq_search_page_size( $query ) {
 }
 
 /**
+ * How many posts a category archive hands the template.
+ *
+ * newCategory.php renders whatever the main query returns and hides everything
+ * past the first ten, which the "Shfaq me shume" button then reveals ten at a
+ * time. That only works if the query returns more than ten in the first place,
+ * and WordPress's posts_per_page option is 10 -- so the template received
+ * exactly ten posts, hid none of them, and the reveal button's condition
+ * ($joq_cat_i > $joq_cat_step) could never be true.
+ *
+ * Every category in either local database had ten posts or fewer, so the page
+ * looked correct on both machines. In production, where a category holds
+ * hundreds, readers could reach ten articles per category and no more. The
+ * legacy AJAX loader that used to cover this, pages/load-more-category.php,
+ * is dead code -- it opens with a bare `return;`.
+ *
+ * 100 rather than -1 on purpose: a category with several thousand posts would
+ * otherwise render several thousand cards into one cached HTML file. Anything
+ * past 100 is reached by ordinary WordPress pagination.
+ */
+add_action( 'pre_get_posts', 'joq_category_page_size' );
+function joq_category_page_size( $query ) {
+    if ( ! is_admin() && $query->is_main_query() && $query->is_category() ) {
+        $query->set( 'posts_per_page', 100 );
+    }
+}
+
+/**
  * WordPress would 301 /faqe/x.html to /faqe/x/ and /kosova/index.html to
  * /kategori/kosova/, which are not the URLs this site publishes.
  */
@@ -962,7 +989,10 @@ function joq_schema_headline( $title ) {
     if ( mb_strlen( $title, 'UTF-8' ) <= 110 ) {
         return $title;
     }
-    $cut   = mb_substr( $title, 0, 110, 'UTF-8' );
+    /* 107, not 110: the ellipsis is part of the string Google measures, so
+       cutting at 110 and appending "..." produced 113-character headlines --
+       volume testing on real-length Albanian titles emitted one at 112. */
+    $cut   = mb_substr( $title, 0, 107, 'UTF-8' );
     $space = mb_strrpos( $cut, ' ', 0, 'UTF-8' );
     if ( $space > 60 ) {
         $cut = mb_substr( $cut, 0, $space, 'UTF-8' );
