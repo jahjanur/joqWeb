@@ -435,7 +435,7 @@ get_template_part( 'templates/joqFooter' );
     
 
     <a href="https://wa.me/+355699299998" id="whatsapp-button" class="mobile-only">
-        <img width="24px" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg">
+        <img width="24px" height="24" src="https://static.joq-albania.com/assets/images/whatsapp-logo.svg" alt="D&euml;rgo denoncim n&euml; WhatsApp" decoding="async">
     </a>
 
 
