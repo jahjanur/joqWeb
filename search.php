@@ -15,6 +15,7 @@ $joq_term      = get_search_query();
 <!DOCTYPE html>
 <html prefix="og: https://ogp.me/ns#" lang="sq-AL">
 <head>
+    <?php get_template_part( 'templates/parts/gtm-head' ); ?>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, follow" />

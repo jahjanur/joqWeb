@@ -534,6 +534,14 @@ if ( ! defined( 'JOQ_ICON_VER' ) ) {
     define( 'JOQ_ICON_VER', '2' );
 }
 
+/** Google Tag Manager container. Read by templates/parts/gtm-head.php and
+ *  templates/parts/gtm-body.php, which are the only two places the snippet
+ *  lives now -- it used to be pasted into three templates and missing from
+ *  four others. */
+if ( ! defined( 'JOQ_GTM_ID' ) ) {
+    define( 'JOQ_GTM_ID', 'GTM-5LHWR57' );
+}
+
 /**
  * URL of the tile icon for a category slug, or '' when there is none.
  *
