@@ -30,13 +30,18 @@
     <meta property="og:url" content="https://joq-albania.com/artikull/<?php echo $ID ?>.html" />
     <meta property="og:title" content="<?php echo esc_attr($title); ?>" />
     <meta property="og:description" content="<?php echo wp_trim_words( $text, 40, '...' ); ?>" />
-    <meta property="og:image" content="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $ID,'full' )); ?>" />
+    <meta property="og:image" content="<?php echo joq_absolute_url(fix_post_thumbnail(get_the_post_thumbnail_url( $ID,'full' ))); ?>" />
     <!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="<?php echo esc_attr($title); ?>" />
 	<meta name="twitter:description" content="<?php echo wp_trim_words( $text, 40, '...' ); ?>" />
-	<meta name="twitter:image" content="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $ID,'full' )); ?>" />
+	<meta name="twitter:image" content="<?php echo joq_absolute_url(fix_post_thumbnail(get_the_post_thumbnail_url( $ID,'full' ))); ?>" />
 	<meta name="twitter:site" content="@JoqAlbania" />
+
+    <?php /* Structured data. Invisible to readers; this is what Google News and
+             Discover read to decide whether to surface the story. */ ?>
+    <?php echo joq_news_article_jsonld( $post ); ?>
+    <?php echo joq_breadcrumb_jsonld( $post ); ?>
 
     <title><?php echo $title; ?></title>
 
