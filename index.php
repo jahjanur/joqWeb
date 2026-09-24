@@ -329,9 +329,23 @@ if ( $joq_hero_q->have_posts() ) {
                 wp_reset_postdata();
               }
 
-              /* The rail only needs to avoid what sits beside it. Excluding the
-                 whole feed would push it onto days-old posts, which defeats
-                 a list called "Të fundit". */
+              /* Two exclusion lists, because the right answer depends on how
+                 much content exists.
+
+                 The strict one is everything already placed on the page. The
+                 loose one is only what sits physically beside the rail -- the
+                 hero and the first two blocks -- which was the original rule,
+                 written when this database held 85 posts: excluding the whole
+                 feed back then pushed the rail onto days-old stories, which
+                 defeats a list called "Të fundit".
+
+                 At production volume that trade-off inverts. Volume testing at
+                 639 posts showed the loose rule repeating seven stories between
+                 the category blocks and the rail, because there are now more
+                 than two blocks and the loose list never covered the rest. With
+                 this much content the strict list still yields posts from the
+                 last few hours, so it is tried first and the loose one is only
+                 a fallback for a thin database. */
               $joq_rail_exclude = $joq_hero_ids;
               for ( $c = 0; $c < 2 && $c < count( $joq_blocks ); $c++ ) {
                 foreach ( array_slice( $joq_stream, $c * 3, 3 ) as $nearPost ) {
@@ -611,9 +625,16 @@ if ( $joq_hero_q->have_posts() ) {
                   'posts_per_page'   => 7,
                   'post_status'      => 'publish',
                   'category__not_in' => $joq_excluded,
-                  'post__not_in'     => $joq_rail_exclude,
+                  'post__not_in'     => $joq_shown,
                 );
               $lastHeadlines = new WP_Query( $argsQuery );
+              /* Thin database: the strict list left the rail short, so fall back
+                 to excluding only what sits beside it. A half-empty rail is
+                 worse than a repeat. */
+              if ( $lastHeadlines->post_count < 7 ) {
+                $argsQuery['post__not_in'] = $joq_rail_exclude;
+                $lastHeadlines = new WP_Query( $argsQuery );
+              }
                 while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();
                   $i++;
                   $joq_shown[] = get_the_ID();

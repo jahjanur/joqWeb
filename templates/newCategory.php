@@ -224,6 +224,29 @@
                 <?php /* Without JS nothing can reveal the rest, so show everything. */ ?>
                 <noscript><style>.joq-category__article.is-hidden{display:flex}.joq-category__load-more{display:none}</style></noscript>
 
+                <?php
+                /* The reveal covers the first 100 posts. A busy category holds
+                   far more than that, so anything past the hundredth is reached
+                   by ordinary pagination -- without these links it was simply
+                   unreachable. The format is ?paged=N because the public URL is
+                   /kategori/{slug}.html and the pretty /page/2/ form 404s
+                   against that route. */
+                $joq_cat_pagination = paginate_links( array(
+                    'format'    => '?paged=%#%',
+                    'mid_size'  => 1,
+                    'prev_text' => '&larr;',
+                    'next_text' => '&rarr;',
+                    'type'      => 'array',
+                ) );
+                ?>
+                <?php if ( $joq_cat_pagination ) : ?>
+                <nav class="joq-pagination" aria-label="Faqet e kategoris&euml;">
+                    <?php foreach ( $joq_cat_pagination as $joq_cat_link ) : ?>
+                        <?php echo str_replace( array( 'page-numbers', 'joq-pagination__link current' ), array( 'joq-pagination__link', 'joq-pagination__link is-current' ), $joq_cat_link ); ?>
+                    <?php endforeach; ?>
+                </nav>
+                <?php endif; ?>
+
                 <?php if ( $joq_cat_i > $joq_cat_step ) : ?>
                 <div class="joq-category__load-more">
 	                <button type="button" id="load-more-art" class="joq-category__load-btn"
