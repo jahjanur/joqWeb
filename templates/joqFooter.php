@@ -91,7 +91,7 @@ if ( $joq_footer_last_news && ! empty( $joq_footer_last_news_cat ) ) {
     <!-- App download banner -->
     <div class="joq-footer__app-banner">
         <div class="joq-footer__app-banner-inner">
-            <div>
+            <div class="joq-footer__app-banner-text">
                 <span class="joq-footer__app-badge">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     Falas
@@ -117,6 +117,14 @@ if ( $joq_footer_last_news && ! empty( $joq_footer_last_news_cat ) ) {
                         <strong>Google Play</strong>
                     </span>
                     <svg class="joq-footer__app-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+
+                <?php /* Desktop only: a QR is pointless on the device you would
+                         scan it with. The store links above stay real links on
+                         every screen. */ ?>
+                <a href="#" class="joq-qr__direct pc-only" data-joq-qr>
+                    Skano kodin QR
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
             </div>
         </div>
@@ -261,4 +269,51 @@ if ( $joq_footer_last_news && ! empty( $joq_footer_last_news_cat ) ) {
 <button type="button" class="joq-scroll-top" aria-label="Kthehu lart">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
 </button>
+
+<?php
+/* App-download modal. Its CSS (.joq-qr, 15 rules) and its JavaScript
+   (joq-design-system.js -- open on [data-joq-qr], close on .joq-qr__close, on
+   backdrop click and on Escape) both shipped with the port, but no template
+   ever emitted the markup, so the handler has been sitting idle behind a
+   null-check since day one.
+
+   The QR image itself is a missing asset. Rather than show an empty bordered
+   box -- which is what the mockup does -- the code panel only renders when the
+   file exists, and the store link below it works either way. Drop a PNG at
+   assets/images/joq-app-qr.png and it appears with no code change. */
+$joq_qr_file = get_template_directory() . '/assets/images/joq-app-qr.png';
+$joq_qr_has  = file_exists( $joq_qr_file );
+?>
+<div class="joq-qr" role="dialog" aria-modal="true" aria-label="Shkarko aplikacionin JOQ Albania">
+    <div class="joq-qr__card">
+        <button type="button" class="joq-qr__close" aria-label="Mbyll">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+
+        <div class="joq-qr__icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+
+        <h3 class="joq-qr__title">Shkarko JOQ Albania</h3>
+        <p class="joq-qr__sub"><?php echo $joq_qr_has ? 'Skano kodin QR me telefonin t&euml;nd' : 'Hape n&euml; telefonin t&euml;nd'; ?></p>
+
+        <?php if ( $joq_qr_has ) : ?>
+        <div class="joq-qr__code">
+            <span class="joq-qr__placeholder">
+                <img src="<?php echo $joq_theme_uri; ?>/assets/images/joq-app-qr.png" width="180" height="180" alt="Kodi QR p&euml;r aplikacionin JOQ Albania" loading="lazy" decoding="async" />
+            </span>
+        </div>
+        <?php endif; ?>
+
+        <a class="joq-qr__direct" href="https://apps.apple.com/al/app/joq-al/id1224913299" target="_blank" rel="noopener">
+            App Store
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        &nbsp;&nbsp;
+        <a class="joq-qr__direct" href="https://play.google.com/store/apps/details?id=com.joqAlbania.al" target="_blank" rel="noopener">
+            Google Play
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+    </div>
+</div>
 <!-- End Footer -->
