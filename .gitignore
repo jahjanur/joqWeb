@@ -7,3 +7,11 @@ Thumbs.db
 node_modules/
 vendor/
 .cache/
+
+# Icon sources. _png-1024/ is committed: it is what the 144px WebPs are
+# exported from. _raw/ is the untouched 12MB Higgsfield output and is kept
+# out of the theme repo.
+assets/images/icons/_raw/
+
+# Session working notes, not theme code.
+okay-so-here-is-curried-bengio.md

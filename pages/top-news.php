@@ -102,7 +102,7 @@ foreach ($posts as $p) :
 ?>
 
 <div class="article-sys4">
-<div class="photo-article-sys4"><a href="<?php echo get_permalink( $p->ID ); ?>"><img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'img2' )) ?>"></a></div>
+<div class="photo-article-sys4"><a href="<?php echo get_permalink( $p->ID ); ?>"><?php echo joq_thumb_img( $p->ID, 'img2', array( 'alt' => get_the_title( $p->ID ), 'width' => false, 'height' => false, 'loading' => false ) ); ?></a></div>
 <div class="box-text-article-sys4">
 <span class="video-sys4"></span>
 <div class="article-text-sys4 homemidFix2"><a href="<?php echo get_permalink( $p->ID ); ?>"><?php echo $p->post_title ?></a></div>
@@ -167,28 +167,26 @@ $args = array(
 
 $ajaxLoad = 1;
 
+/* Emits the homepage "Më të lexuarat" strip (.joq-trending in index.php).
+   Order comes from the popularity API above via post__in. Production caches
+   this output to /myAjax/top-news2.html — regenerate it after deploying. */
 $posts = get_posts($args);
+$rank  = 0;
 foreach ($posts as $p) :
-
-    $category = get_the_category($p->ID); 
-    
-
+    $rank++;
 ?>
 
-<div class="article-wrapper">
-    <a href="<?php echo get_permalink( $p->ID ); ?>">
-        <div class="article-image">
-            <img src="<?php echo fix_post_thumbnail(get_the_post_thumbnail_url( $p->ID, 'img2' )) ?>" 
-            alt="<?php echo $p->post_title ?> ">
+<article class="joq-trending__item">
+    <a href="<?php echo get_permalink( $p->ID ); ?>" title="<?php echo esc_attr( $p->post_title ); ?>">
+        <div class="joq-trending__top">
+            <span class="joq-trending__num"><?php echo str_pad( $rank, 2, '0', STR_PAD_LEFT ); ?></span>
+            <div class="joq-trending__img">
+                <?php echo joq_thumb_img( $p->ID, 'img2', array( 'alt' => $p->post_title, 'width' => false, 'height' => false ) ); ?>
+            </div>
         </div>
-        <div class="article-title">
-            <?php echo $p->post_title ?> 
-        </div>
+        <div class="joq-trending__title"><?php echo $p->post_title ?></div>
     </a>
-    <a class="article-cat-link" href="https://joq-albania.com/kategori/<?php echo $category[0]->slug; ?>.html">
-        <div class="article-cat"><?php echo $category[0]->cat_name; ?></div>
-    </a>
-</div>
+</article>
 
 <?php endforeach; ?>
 
