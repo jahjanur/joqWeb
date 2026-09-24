@@ -12,7 +12,33 @@
  */
 
 $joq_theme_uri = '/wp-content/themes/joq';
+
+/* The ticker used to live inline in index.php, so only the homepage had it.
+   The design puts it inside the header, which means every page type. Built
+   here so article, category, search, Live and the static pages get it too.
+
+   $joq_excluded is a homepage-only variable; everywhere else there is nothing
+   to exclude. */
+$joq_tick_excluded = isset( $joq_excluded ) && is_array( $joq_excluded ) ? $joq_excluded : array();
+$joq_tick_q = new WP_Query( array(
+    'post_type'           => 'post',
+    'posts_per_page'      => 8,
+    'post_status'         => 'publish',
+    'category__not_in'    => $joq_tick_excluded,
+    'ignore_sticky_posts' => true,
+    'no_found_rows'       => true,
+) );
+$joq_tick_items = '';
+$joq_tick_count = 0;
+foreach ( $joq_tick_q->posts as $joq_tick_p ) {
+    $joq_tick_count++;
+    $joq_tick_items .= '<a class="joq-ticker__item" href="' . esc_url( get_permalink( $joq_tick_p->ID ) ) . '">'
+        . '<strong>' . get_the_date( 'H:i', $joq_tick_p->ID ) . '</strong>&nbsp; '
+        . esc_html( get_the_title( $joq_tick_p->ID ) ) . '</a>';
+}
 ?>
+
+<header class="joq-header">
 
 <!-- Toolbar -->
 <div class="joq-header__top">
@@ -31,7 +57,7 @@ $joq_theme_uri = '/wp-content/themes/joq';
     </div>
 </div>
 
-<header class="joq-header__nav">
+<nav class="joq-header__nav">
     <div class="joq-header__nav-inner">
 
         <a href="/" class="joq-header__logo" title="JOQ Albania">
@@ -122,6 +148,34 @@ $joq_theme_uri = '/wp-content/themes/joq';
         </div>
 
     </div>
+
+    <?php /* Reading progress. The JS that drives this has been in
+             joq-design-system.js since the port (it sets the fill width on
+             scroll) but the markup it looks for was never written, so the
+             handler has been sitting idle behind a null-check. */ ?>
+    <div class="joq-progress" role="progressbar" aria-label="Progresi i shfletimit"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span class="joq-progress__fill"></span>
+    </div>
+</nav>
+
+<?php if ( $joq_tick_items ) : ?>
+<div class="joq-ticker" role="region" aria-label="Lajmet e fundit">
+    <div class="joq-ticker__inner">
+        <span class="joq-ticker__badge">E fundit</span>
+        <div class="joq-ticker__scroll">
+            <?php /* track is duplicated so the -50% translate loops seamlessly;
+                     --n scales the animation duration to the number of items */ ?>
+            <div class="joq-ticker__track" style="--n: <?php echo (int) $joq_tick_count; ?>"><?php echo $joq_tick_items . $joq_tick_items; ?></div>
+        </div>
+        <button type="button" class="joq-ticker__toggle" aria-pressed="false" aria-label="Ndalo l&euml;vizjen">
+            <svg class="joq-ticker__ico-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+            <svg class="joq-ticker__ico-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+        </button>
+    </div>
+</div>
+<?php endif; ?>
+
 </header>
 <!-- End Toolbar -->
 

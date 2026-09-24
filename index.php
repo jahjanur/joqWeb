@@ -196,38 +196,6 @@ if ( $joq_hero_q->have_posts() ) {
       $joq_hero_ids  = array();
     ?>
 
-    <!-- Latest ticker -->
-    <?php
-      $tickerQ = new WP_Query( array(
-        'post_type'        => 'post',
-        'posts_per_page'   => 8,
-        'post_status'      => 'publish',
-        'category__not_in' => $joq_excluded,
-      ) );
-      $tickerItems = '';
-      $tickerCount = 0;
-      while ( $tickerQ->have_posts() ) : $tickerQ->the_post();
-        $tickerCount++;
-        $tickerItems .= '<a class="joq-ticker__item" href="' . get_permalink() . '"><strong>' . get_the_date( 'H:i' ) . '</strong>&nbsp; ' . esc_html( get_the_title() ) . '</a>';
-      endwhile; wp_reset_postdata();
-    ?>
-    <?php if ( $tickerItems ) : ?>
-    <div class="joq-ticker" role="region" aria-label="Lajmet e fundit">
-      <div class="joq-ticker__inner">
-        <span class="joq-ticker__badge">E fundit</span>
-        <div class="joq-ticker__scroll">
-          <?php /* track is duplicated so the -50% translate loops seamlessly;
-                   --n scales the animation duration to the number of items */ ?>
-          <div class="joq-ticker__track" style="--n: <?php echo $tickerCount; ?>"><?php echo $tickerItems . $tickerItems; ?></div>
-        </div>
-        <button type="button" class="joq-ticker__toggle" aria-pressed="false" aria-label="Ndalo l&euml;vizjen">
-          <svg class="joq-ticker__ico-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-          <svg class="joq-ticker__ico-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7 4 20 12 7 20 7 4"/></svg>
-        </button>
-      </div>
-    </div>
-    <?php endif; ?>
-    <!-- End Latest ticker -->
 
     <!-- Home Headline -->
     <div class="joq-hero">
@@ -873,7 +841,7 @@ if ( $joq_hero_q->have_posts() ) {
           <a class="joq-section__more" href="/kategori/vec-e-jona.html">T&euml; gjitha &rarr;</a>
         </div>
 
-        <div>
+        <div class="joq-list">
         <?php
           $vecNum = 0;
           while( $lastHeadlines->have_posts() ): $lastHeadlines->the_post();

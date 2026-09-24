@@ -641,6 +641,14 @@
                         <div class="adunit-1" data-adunit="joq__300x250-3" data-dimensions="300x250"></div>
                     </div>
 
+                    <?php /* The design puts "Me te Lexuarat" between the first two
+                             300x250 slots. Ranked within this article's category,
+                             excluding the article being read. */
+                        $GLOBALS['joq_widget_cat']     = ! empty( $postCats ) ? (int) $postCats[0]->term_id : 0;
+                        $GLOBALS['joq_widget_exclude'] = array( $ID );
+                        get_template_part( 'templates/parts/most-read-widget' );
+                    ?>
+
 					<div class="pc-only" style="width:300px; height:auto; margin-bottom:5px;">
                         <div class="adunit-1" data-adunit="joq__300x250-9" data-dimensions="300x250"></div>
                     </div>
@@ -702,21 +710,15 @@
                         </script>
                     </div> -->
 
-					<!-- Category Top News -->
-		    		<div class="home-last-news home-content-item category-tpl" style="display: block;">
-		    			<div class="article-wrapper">
-		    				<div class="block-title">
-			    				Më të Lexuarat
-			    			</div>
-		    				<div class="top-news-articles"></div>
-	                        <script type="text/javascript">
-	                            $.get( "/myAjax/top-news-post2.html", function( data ) {
-	                              $( ".top-news-articles" ).html( data );
-	                            });
-	                        </script>
-		    			</div>
-		    		</div>
-		    		<!-- Category Top News  -->
+					<?php /* The old "Me te Lexuarat" lived here: an AJAX call to
+					         /myAjax/top-news-post2.html, a single SITE-WIDE fragment. It
+					         put other categories' stories on the page, cost a request per
+					         reader on a page that is otherwise served as a static file,
+					         and left the heading stranded above an empty box whenever the
+					         request failed. It is now the design system's .joq-post__widget,
+					         server-rendered and category-scoped, higher up the sidebar
+					         where the design puts it. */ ?>
+
 
                     <div id="joq-banner" class="pc-only" style="width:300px; height:auto; margin-bottom:5px;overflow: hidden;"></div>
 

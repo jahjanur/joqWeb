@@ -212,6 +212,16 @@
 	                    </div>
 	                    <div class="joq-category__article-body">
 	                        <a href="<?php echo get_permalink(); ?>">
+	                            <?php /* The design puts a category label above the title. On
+	                                     this archive it is usually the archive's own category
+	                                     and therefore redundant, so it is only printed when
+	                                     the post's primary category is a DIFFERENT one --
+	                                     i.e. when it actually tells the reader something. */
+	                              $joq_card_cats = get_the_category();
+	                              $joq_card_cat  = ! empty( $joq_card_cats ) ? $joq_card_cats[0] : null;
+	                              if ( $joq_card_cat && (int) $joq_card_cat->term_id !== (int) $thiscat->term_id ) : ?>
+	                            <div class="joq-category__article-cat"><?php echo esc_html( $joq_card_cat->cat_name ); ?></div>
+	                            <?php endif; ?>
 	                            <div class="joq-category__article-title">
 	                                <?php echo the_title(); ?>
 	                            </div>
@@ -219,7 +229,7 @@
 	                                <?php $text = wp_strip_all_tags(get_the_content()); echo wp_trim_words( $text, 40, '...' ); ?>
 	                            </div>
 	                            <div class="joq-category__article-meta">
-	                                <?php $catAuthor = joq_author_line(); if ( $catAuthor ) : ?>Shkruar nga: <?php echo esc_html( $catAuthor ); ?> | <?php endif; ?>Publikuar m&euml;: <?php echo  get_the_date( 'd.m.Y, H:i' );?>
+	                                <?php $catAuthor = joq_author_line(); if ( $catAuthor ) : ?><span class="joq-category__article-author">Shkruar nga: <?php echo esc_html( $catAuthor ); ?></span> | <?php endif; ?>Publikuar m&euml;: <?php echo  get_the_date( 'd.m.Y, H:i' );?>
 	                            </div>
 	                        </a>
 	                    </div>
@@ -275,36 +285,15 @@
 						<div id="lupon300x250-1"></div>
 					</div>
 
-					<?php
-					  /* Scoped to this category on purpose. /myAjax/top-news-post2.html is a
-					     single site-wide fragment, so loading it here put other categories'
-					     stories on the page. A quiet category can return nothing, and then
-					     the module is left out rather than padded with foreign posts. */
-					  $joq_cat_popular = joq_popular_posts_in_category( $thiscat->term_id, 4 );
+					<?php /* "Me te Lexuarat" as the design system's .joq-post__widget.
+					         It was built from newstyle.css classes (.article-wrapper /
+					         .block-title / .top-news-articles), which is why it never
+					         looked like the mockup. The category scoping stays: the old
+					         /myAjax/top-news-post2.html fragment is site-wide and put
+					         other categories' stories on the page. */
+						$GLOBALS['joq_widget_cat'] = (int) $thiscat->term_id;
+						get_template_part( 'templates/parts/most-read-widget' );
 					?>
-					<?php if ( $joq_cat_popular ) : ?>
-					<div class="article-wrapper">
-                        <div class="block-title">
-                            M&euml; t&euml; Lexuarat
-                        </div>
-
-                        <div class="top-news-articles">
-                            <?php foreach ( $joq_cat_popular as $joq_pp ) :
-                              $joq_pp_img = fix_post_thumbnail( get_the_post_thumbnail_url( $joq_pp->ID, 'img2' ) );
-                            ?>
-                            <div class="last-news-article-wrapper">
-                                <a href="<?php echo get_permalink( $joq_pp->ID ); ?>">
-                                    <div class="article-image"<?php if ( $joq_pp_img ) : ?> style="background-image: url(<?php echo esc_url( $joq_pp_img ); ?>);"<?php endif; ?>></div>
-                                    <div class="article-title">
-                                        <?php echo get_the_title( $joq_pp->ID ); ?>
-                                    </div>
-                                </a>
-                                <div style="clear: both;"></div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-					<?php endif; ?>
 					
 					<div class="pc-mob-banner" style="width:300px; height:auto; margin-bottom:5px;">
 						<div class="adunit-1" data-adunit="joq__PC-300x250-last" data-dimensions="300x250" style="width:300px; height:250px;"></div>
