@@ -799,6 +799,63 @@ if ( $joq_hero_q->have_posts() ) {
       <!-- End Most read -->
       <?php endif; ?>
 
+      <?php
+        /* "Ofron JOQ" -- the designer's .joq-featured-grid. All eight of its
+           classes have had CSS in the theme since the port; nothing ever
+           emitted the markup, so the section has never appeared.
+
+           The content is not a curated or sponsored set, which is what it
+           sounds like. home.html fetches it as
+           /posts?per_page=4&categories=56&offset=5 -- the hero's own category,
+           skipping the posts the hero already used. Same idea here, except the
+           skipping is done with $joq_shown, which is more accurate than a
+           fixed offset because it also excludes anything the feed picked up.
+
+           Queried before the <section> opens so an empty result prints no
+           heading, the same guard every other row on this page uses. */
+        $joq_feat_q = new WP_Query( array(
+          'post_type'           => 'post',
+          'post_status'         => 'publish',
+          'category_name'       => 'aktualitet',
+          'posts_per_page'      => 4,
+          'post__not_in'        => $joq_shown,
+          'ignore_sticky_posts' => true,
+          'no_found_rows'       => true,
+        ) );
+        foreach ( $joq_feat_q->posts as $joq_feat_p ) { $joq_shown[] = $joq_feat_p->ID; }
+      ?>
+      <?php if ( $joq_feat_q->have_posts() ) : ?>
+      <!-- Ofron JOQ -->
+      <section class="joq-section" data-animate>
+        <div class="joq-section__header">
+          <h2 class="joq-section__title">Ofron JOQ</h2>
+        </div>
+        <div class="joq-featured-grid">
+          <?php foreach ( $joq_feat_q->posts as $joq_feat_p ) :
+            $joq_feat_cats = get_the_category( $joq_feat_p->ID );
+          ?>
+          <article class="joq-featured-card">
+            <a href="<?php echo esc_url( get_permalink( $joq_feat_p->ID ) ); ?>">
+              <div class="joq-featured-card__img">
+                <?php echo joq_thumb_img( $joq_feat_p->ID ); ?>
+                <div class="joq-featured-card__overlay">
+                  <?php if ( ! empty( $joq_feat_cats ) ) : ?>
+                  <span class="joq-featured-card__cat"><?php echo esc_html( $joq_feat_cats[0]->cat_name ); ?></span>
+                  <?php endif; ?>
+                </div>
+              </div>
+              <div class="joq-featured-card__body">
+                <h3 class="joq-featured-card__title"><?php echo get_the_title( $joq_feat_p->ID ); ?></h3>
+                <time class="joq-featured-card__time" datetime="<?php echo get_the_date( 'c', $joq_feat_p->ID ); ?>"><?php echo get_the_date( 'd.m.Y', $joq_feat_p->ID ); ?></time>
+              </div>
+            </a>
+          </article>
+          <?php endforeach; ?>
+        </div>
+      </section>
+      <!-- End Ofron JOQ -->
+      <?php endif; ?>
+
       <!-- Report CTA -->
       <section class="joq-report" data-animate>
         <span class="joq-report__icon">
