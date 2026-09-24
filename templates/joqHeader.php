@@ -13,6 +13,12 @@
 
 $joq_theme_uri = '/wp-content/themes/joq';
 ?>
+<?php
+/* GTM's <noscript> half. It belongs immediately after <body>, and every page
+   type calls this header within a few lines of its own <body> tag, so putting
+   it here covers all of them from one place and no page can end up with two. */
+get_template_part( 'templates/parts/gtm-body' );
+?>
 
 <!-- Toolbar -->
 <div class="joq-header__top">
